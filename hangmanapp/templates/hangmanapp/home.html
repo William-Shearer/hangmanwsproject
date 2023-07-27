@@ -1,0 +1,12 @@
+{% extends "hangmanapp/layout.html" %}
+
+{% block title %}Home{% endblock %}
+
+
+
+{% block body %}
+
+    <h1>Logged in: {{ request.user.username }}</h1>
+    <a href="{% url 'logout' %}">Log Out</a>
+
+{% endblock %}
