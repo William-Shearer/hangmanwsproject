@@ -1,0 +1,22 @@
+{% extends "hangmanapp/layout.html" %}
+
+{% block title %}Game{% endblock %}
+
+{% block head %}
+    {% load static %}
+    <script src="{% static 'hangmanapp/game.js' %}"></script>
+{% endblock %}
+
+{% block body %}
+
+    <h1></h1>
+
+    <div class="pWordFrame">
+        
+    </div>
+
+    <div class="btnFrame">
+
+    </div>
+
+{% endblock %}

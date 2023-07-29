@@ -5,7 +5,9 @@
         <title>{% block title %}{% endblock %}</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="initial-scale=1, width=device-width">
-        
+        {% load static %}
+        <link rel="icon" type="image/xicon" href="{% static 'hangmanapp/favicon.png' %}">
+        {% block head %}{% endblock %}
     </head>
 
     <body>

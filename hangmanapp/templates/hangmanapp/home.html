@@ -3,10 +3,11 @@
 {% block title %}Home{% endblock %}
 
 
-
 {% block body %}
 
     <h1>Logged in: {{ request.user.username }}</h1>
     <a href="{% url 'logout' %}">Log Out</a>
+    <br>
+    <a href="{% url 'game' %}">Play Game</a>
 
 {% endblock %}

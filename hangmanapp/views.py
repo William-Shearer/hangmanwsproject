@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
 from django.db import IntegrityError
+from .functions import *
 from .models import *
 from .forms import *
 
@@ -85,5 +86,27 @@ def home_page(request):
             return render(request, "hangmanapp/home.html")
     else:
         return HttpResponse("<h1>Error: Should not have a POST request (yet)</h1>")
-    
 
+
+def game(request):
+    if request.method == "GET":
+        return render(request, "hangmanapp/game.html")
+    else:
+        return HttpResponse("No POST for now")
+
+
+def fetch_word(request):
+    if request.method == "GET":
+        if word := get_word():
+            data_word = {
+                "userId": request.user.id,
+                "userName": request.user.username,
+                "word": word}
+            return JsonResponse(data_word)
+        else:
+            data_word = {"word": ["f", "o", "o"]}
+            print("Error: Word not found")
+            return JsonResponse(data_word)
+    else:
+        return HttpResponse("Error: POST request attempted")
+    
