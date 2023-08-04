@@ -3,7 +3,13 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
 from django.db import IntegrityError
-from .functions import *
+from django.views.decorators.csrf import csrf_exempt
+import json
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
+from django.core.exceptions import ObjectDoesNotExist
+from random import randint
+# from .functions import *
 from .models import *
 from .forms import *
 
@@ -33,7 +39,7 @@ def login_view(request):
             login(request, user)
             return redirect(reverse("home"))
         else:
-            context = {"form": LoginForm, "message": "Incorrect login credentials"}
+            context = {"form": LoginForm, "message": "Incorrect login credentials."}
             return render(request, "hangmanapp/login.html", context = context)
     
 
@@ -73,9 +79,9 @@ def register_view(request):
                 context = {"form": RegisterForm, "message": "Passwords do not match"}
                 return render(request, "hangmanapp/register.html", context = context)
         else:
-            return HttpResponse("<h1>Critical Error: Form not valid</h1>")
+            return HttpResponse("<h1>Critical Error: Form not valid.</h1>")
     else:
-        return HttpResponse("<h1>Critical Error: Not a POST or GET request - this is BAD</h1>")
+        return HttpResponse("<h1>Critical Error: Not a POST or GET request - this is BAD.</h1>")
 
 
 def home_page(request):
@@ -85,28 +91,114 @@ def home_page(request):
         else:
             return render(request, "hangmanapp/home.html")
     else:
-        return HttpResponse("<h1>Error: Should not have a POST request (yet)</h1>")
+        return HttpResponse("<h1>Error: Should not have a POST request.</h1>")
 
 
 def game(request):
     if request.method == "GET":
         return render(request, "hangmanapp/game.html")
     else:
-        return HttpResponse("No POST for now")
+        return HttpResponse("No POST for now.")
+
+
+def general_error(request):
+    return render(request, "hangmanapp/error.html")
 
 
 def fetch_word(request):
     if request.method == "GET":
-        if word := get_word():
-            data_word = {
-                "userId": request.user.id,
-                "userName": request.user.username,
-                "word": word}
-            return JsonResponse(data_word)
+        if word_select := get_last_user_word(request.user):
+            """
+            Note: get_last_user_word returns an existing word in the DB
+            or otherwise creates a new one. Failure of either will return False.
+            The data can be sent to JavaScript now as a dict. There, it will be
+            treated as a JavaScript object.
+            The keys here are used in JavaScript to get the object elements.
+            """
+            print(word_select.word)
+            word_data = {
+                "id": word_select.id,
+                "user": request.user.username,
+                "word": word_select.word,
+                "playerWord": word_select.player_word,
+                "hits": word_select.hits,
+                "misses": word_select.misses,
+                "usedLetters": word_select.used_letters,
+                "complete": word_select.complete
+            }
+            print(word_data["usedLetters"])
+            return JsonResponse(word_data)
         else:
-            data_word = {"word": ["f", "o", "o"]}
-            print("Error: Word not found")
-            return JsonResponse(data_word)
+            print("ERROR: No way, no how. Word not found. Anywhere.")
+            # Actually, don't even send it to JavaScript. word_data is redundant in this case.
+            return HttpResponse("ERROR: Bad Things Are Happening.")
+            # return redirect(reverse("error"))
+            """
+            Eventually, it would be a good idea to redirect this to an error html page, 
+            where the program may recover. Best bet there would be to perform
+            an emergency clean of the DB, and prompt the player to try again with
+            an automated fresh start.
+            """
     else:
-        return HttpResponse("Error: POST request attempted")
+        # No POST or PUT should ever happen, here.
+        print("ERROR: A POST/PUT was attempted.")
+        return HttpResponse("ERROR: Bad! Very bad! POST/PUT request attempted here.")
+        # return redirect(reverse("error"))
     
+
+@csrf_exempt
+def put_history(request, word_id):
+    if request.method == "PUT":
+        try:
+            wObj_data = json.loads(request.body)
+            word_DB = UserWordHistory.objects.get(id = word_id)
+            word_DB.player_word = wObj_data["playerWord"]
+            word_DB.hits = wObj_data["hits"]
+            word_DB.misses = wObj_data["misses"]
+            word_DB.used_letters = wObj_data["usedLetters"]
+            word_DB.complete = wObj_data["complete"]
+            word_DB.save()
+            return HttpResponse("DONE")
+        except IntegrityError as error:
+            print("ERROR: Problem getting the data base record in put_history.")
+            return HttpResponse(f"ERROR: In put_history, {error}")
+    else:
+        print("ERROR: Something other than PUT was attempted in put_history")
+        return HttpResponse("ERROR: This is only a PUT function.")
+    
+
+
+def create_new_word():
+    """
+    Notes in previous version of get_word apply. The only difference is that
+    the word is now returned as a string, and not converted to a Python list.
+    """
+    
+    with default_storage.open("wordbank/nouns_en.txt") as wordfile:
+        words = wordfile.read().decode().split()
+        word = words[randint(0, len(words) - 1)]            
+        return word
+
+
+def get_last_user_word(user):
+    try:
+        if word_query := UserWordHistory.objects.filter(user = user, complete = False).order_by("id").last():
+            return word_query
+        
+    except:
+        print("Query does not exist, creating new word.")
+        
+    try:
+        word = create_new_word()
+    except:
+        print("Could not create new word.")
+        return False
+    else:
+        word_query = UserWordHistory.objects.create(
+            user = user,
+            word = word,
+            player_word = "_" * len(word),
+            used_letters = ""
+        )
+                
+        return word_query

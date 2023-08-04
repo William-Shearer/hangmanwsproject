@@ -18,5 +18,8 @@ class UserWordHistory(models.Model):
     complete = models.BooleanField(default = False)
 
     def __str__(self):
-        return f"{self.word} for user {self.user.username} completed {self.completed}"
+        return f"The word \"{self.word.upper()}\" for user {self.user.username}, completed {self.complete}"
+    
+    
+
  
