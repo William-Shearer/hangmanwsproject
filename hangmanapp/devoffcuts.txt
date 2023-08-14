@@ -1,0 +1,258 @@
+# PYTHON
+
+def fetch_word(request):
+    if request.method == "GET":
+        
+        # If a word exists in the DB.
+        if word_query := UserWordHistory.objects.filter(user = request.user, complete = False).order_by("id"):
+            """
+            There should never be two incomplete words for any user, but in case there is, 
+            select last (only) in the history list as a safeguard.
+            The order_by id is sufficient for ensuring the last() is the last or current word the
+            player is working on.
+            At some other stage, a routine cleaner will be implemented.
+            """
+            word_select = word_query.last()
+
+            # Debug word_query
+            """
+            print(word_select.word)
+            print(word_select.player_word)
+            print(word_select.hits)
+            print(word_select.misses)
+            print(word_select.used_letters)
+            print(word_select.complete)
+            """
+
+            """
+            Right here. It is IMPORTANT to remember that the function get_word(), seen below, 
+            in functions.py returns the word broken up into a list of characters. Here, the same thing
+            MUST be done. The word, however, is stored in the model as a string. There is another
+            very simple function in functions.py to convert an existing word in the DB into such a list
+            before it is passed to the JavaScript module. Here it is in use.
+            """
+            # Redundant now, but good enough stuff to keep as reference for my notes.
+            # word = convert_to_list(word_select.word)
+            # pWord = convert_to_list(word_select.player_word)
+            # print(len(word))
+
+            """
+            Change of plan. I will have JavaScript doing the conversion to and from array.
+            Here, I will send the whole darn object to JavaScript and do everything up there.
+            This needs to happen on two conditions.
+            1. The word structure is already in the DB.
+            2. The word needs creating.
+            """
+
+            # This creates a nice JavaScript acceptable object.
+            data_word = {
+                "userName": request.user.username,
+                "word": word_select.word,
+                "pWord": word_select.player_word,
+                "hits": word_select.hits,
+                "misses": word_select.misses,
+                "usedLetters": word_select.used_letters,
+                "complete": word_select.complete
+            }
+            # The object is returned to JavaScript at the end of this function.
+
+        else:
+            # If there was no incomplete word (or no words) in the history, create a new word.
+            # This goes straight to the functions.py get_word function.
+            # Remember, get_word already returns the word as a list, no need to use the convert function.
+            """
+            This section is for a word NOT being in the DB labelled as complete false.
+            In this case, player_word needs to be constructed as a string of blanks.
+            That could be done in JavaScript, too, but complicates the code. Better all
+            object preparation is done here.
+            """
+            
+            # A new word was generated because there was no incomplete word in the DB.
+            # if word := get_word():
+                # The blank player word needs generating.
+                # Here is the Python way to do that...
+                # player_word = ["_"] * len(word_select.word)
+                
+                # The JavaScript way to do the same thing is...
+                # let str_array = Array(word.length).fill("_");
+                # I put that here because this switching languages all the time is well confusing,
+                # and I need some starting point to find continuity and equivalence, somehow.
+                # See how that works? Hope it sinks through the ivory, now.
+                
+                # Important update. NOT using lists anymore. both words should be strings.
+                """
+                data_word = {
+                    "userName": request.user.username,
+                    "word": word,
+                    "pWord": "_" * len(word),
+                    "hits": 0,
+                    "misses": 0,
+                    "usedLetters": "",
+                    "complete": False
+                }
+                """
+                # If a word is created, then save the word, with all default parameters from the model.
+                # Defunct, but reference for joining an array into a string...
+                # UserWordHistory.objects.create(user = request.user, word = "".join(word))
+                # New version...
+                """
+                UserWordHistory.objects.create(
+                    user = request.user,
+                    word = data_word["word"],
+                    player_word = data_word["pWord"],
+                    used_letters = ""
+                )
+                """
+                # The object is returned to JavaScript at the end of this function.
+    
+            # else:
+                # If there are any errors, return None. JavaScript will have to handle it frontend.
+                # This is a very bad situation that should not happen, normally.
+                # data_word will just send None. 
+                # Not even the object, just None (which JavaScript will see as null).
+                # data_word = None
+                # print("ERROR: No way, no how. Word not found. Anywhere.")
+                # Actually, don't even send it to JavaScript. data_word is redundant.
+                # return HttpResponse("ERROR: Bad Things Are Happening.")
+                # Eventually, it would be a good idea to redirect this to an error html page, 
+                # where the program may recover from. Best bet there would be to perform
+                # an emergency clean of the DB, and prompt the player to try again with
+                # an automated fresh start.
+
+        # Packaged off to the JavaScript module, if all went well.
+    """
+        return JsonResponse(data_word)
+    
+    else:
+        return HttpResponse("ERROR: Bad! Very bad! POST request attempted here.")
+    """
+    # Right. That is all looking better, now.
+
+
+
+        
+    """
+    if word_query := UserWordHistory.objects.filter(user = user, complete = False).order_by("id"):
+        return word_query.last()
+    else:
+        if word := create_new_word():
+            # If a word is created, then save the word, with all default parameters from the model.
+            # Defunct, but reference for joining an array into a string...
+            # UserWordHistory.objects.create(user = request.user, word = "".join(word))
+            # New version...
+            UserWordHistory.objects.create(
+                user = user,
+                word = word,
+                player_word = "_" * len(word),
+                used_letters = ""
+            )
+            if word_query := UserWordHistory.objects.filter(user = user, complete = False).order_by("id"):
+                return word_query.last()
+            else:
+                return False
+    """
+            """
+            word_query = UserWordHistory.objects.filter(user = user, complete = False).order_by("id").last()
+            return word_query
+            """
+            """
+            if repeat == True:
+                get_last_user_word(user, False)
+                # This case of recursion should only EVER run once, to avoid an infinite loop.
+                # If it does not retrieve a record first time, something is clearly wrong.
+            else:
+                return False
+            """
+        else:
+            return False
+
+    # JAVASCRIPT
+
+    async function fGameInitiate()
+{
+    /* 
+    The game loop start by getting the word with fetch from Django.
+    Go look at fetchword for this process. 
+    This is for the timeOut signal processing.
+    */
+    const controller = new AbortController();
+    // The timeOut function. If this fails, the game fails...
+    const timeOut = setTimeout(
+        function ()
+        {
+            controller.abort();
+        },
+        7000 // Seven seconds maxed out.
+    );
+
+    try
+    {
+        const response = await fetch("fetchword",
+            {
+                method: "GET",
+                signal: controller.signal
+            }
+        );
+        if (response.ok)
+        {
+            console.log(response.status);
+            /* 
+            Here the program gets the word and data back from fetchword url,
+            Aka, fetch_word in views.py.
+            What should come back (from Python), for reference:
+            dataWord = {
+                "userName": request.user.username,
+                "word": word_select.word,
+                "pWord": word_select.player_word,
+                "hits": word_select.hits,
+                "misses": word_select.misses,
+                "usedLetters": word_select.used_letters,
+                "complete": word_select.complete
+            }
+            I'm calling the receive variable much the same name as that sent from Django
+            so that I don't stupidly confuse myself later... data_word, dataWord.
+            */
+            const dataWord = await response.json();
+            // console.log(dataWord.word);
+            /* 
+            Test word debug.
+            document.querySelector("h1").innerText = dataWord.word.join(" ");
+            */
+            // console.log(dataWord); // JavaScript object. Good.
+            // const userName = dataWord.userName;
+            // const word = dataWord.word;
+            // let hits = 0;
+            // let misses = 0;
+            // Debug test them.
+            // console.log(userName, word.join(""));
+            // This is the blank word. It is not a const on purpose, as it will be altered.
+            // let playerWord = Array(dataWord.word.length).fill("_");
+            // Look. Don't be stupid. Just send the object to the game loop, and save all this
+            // faffing about here. Jeez!
+            // The game can now start...
+            // fGameLoop(word, playerWord, userId, userName) //, hits, misses);
+            fGameLoop(dataWord);
+        }
+        else
+        {
+            console.log(`RESPONSE ERROR: ${response.status}`)
+        };
+    }
+    catch (error)
+    {
+        console.log(`NETWORK ERROR: ${error.name}`);
+    }
+    finally
+    {
+        clearTimeout(timeOut);
+    };
+};
+
+/*
+Take note: The application must be protected against the user reloading the browser.
+That means up in the DOMContentLoaded, the word should be fetched from the Django model,
+if it is incomplete. Else, a new word should be generated. This will have the effect
+of saving a session, too. If the player leaves the game before finishing a word, when
+they come back the same word will be presented for them to resume and complete.
+*/
+    

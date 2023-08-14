@@ -16,7 +16,19 @@ class UserWordHistory(models.Model):
     misses = models.PositiveIntegerField(default = 0)
     used_letters = models.CharField(max_length = 30, blank = True, null = True)
     complete = models.BooleanField(default = False)
+    won = models.BooleanField(default = False)
+
+    """
+    Superceded. This was the initial idea, but I have decided that there is
+    nothing wrong with repeating words, only not too frequently.
+    An implementation of the improved mechanism is in functions.py.
+    class Meta:
+        unique_together = ["user", "word"]
+    """
 
     def __str__(self):
-        return f"{self.word} for user {self.user.username} completed {self.completed}"
+        return f"The word \"{self.word.upper()}\" for user {self.user.username}, completed {self.complete}"
+    
+    
+
  

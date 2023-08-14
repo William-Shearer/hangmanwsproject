@@ -2,6 +2,9 @@
 <html>
 
     <head>
+        {% load bootstrap5 %}
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
         <title>{% block title %}{% endblock %}</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="initial-scale=1, width=device-width">
@@ -11,9 +14,59 @@
     </head>
 
     <body>
-        {% if message %}
-            <h3>{{ message }}</h3>
-        {% endif %}
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+
+            <a class="navbar-brand ms-2 ms-md-5" href="{% url 'home' %}">Hangman</a>
+            <button class="navbar-toggler ms-auto me-2" type="button" data-bs-toggle="collapse" data-bs-target="#n_bar" aria-controls="navbarNavAltMarkup" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="n_bar">
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link ms-2" href="{% url 'game' %}">Play</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link ms-2" href="#">Scores</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link ms-2" href="{% url 'logout' %}">Logout</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link ms-2" href="{% url 'login' %}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link ms-2" href="{% url 'register' %}">Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+            <!--
+            <div>
+              <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link mx-1" href="{% url 'game' %}">Play</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link mx-1" href="#">Scores</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link mx-1" href="{% url 'logout' %}">Logout</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link mx-1" href="{% url 'login' %}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link mx-1" href="{% url 'register' %}">Register</a>
+                    </li>
+                {% endif %}
+              </ul>
+            </div>
+        -->
+        </nav>
         {% block body %}{% endblock %}
     </body>
 

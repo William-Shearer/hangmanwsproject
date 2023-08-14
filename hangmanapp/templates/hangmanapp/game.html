@@ -5,18 +5,57 @@
 {% block head %}
     {% load static %}
     <script src="{% static 'hangmanapp/game.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'hangmanapp/gamestyles.css' %}">
+    <script>
+        function fGoHome()
+        {
+            document.location.href="{% url 'home' %}";
+        };
+        function fPlayAgain()
+        {
+            document.location.href="{% url 'game' %}";
+        };
+    </script>
 {% endblock %}
 
 {% block body %}
 
-    <h1></h1>
+<div id="dspFrame" class="container-md justify-content-center align-items-center border border-primary rounded my-1">
 
-    <div class="pWordFrame">
-        
-    </div>
+            <div class="row justify-content-center align-items-center m-1 py-3">
 
-    <div class="btnFrame">
+                <div class="col-12 col-md-5 order-1 text-center">
+                    <canvas id="gameCanvas" width="270" height="320"></canvas>
+                </div>
+                
+                <div class="col-12 col-sm-10 col-md-6 col-lg-5 order-3 order-md-2 py-3 px-2 text-center">
+                    <div id="btnFrame"></div>
+                </div>
 
-    </div>
+                <div class="col-12 col-lg-6 col-md-8 col-sm-10 col-xs-12 order-2 order-md-3">
+                    <h1 id="pWordFrame" class="display-3 text-center"></h1>
+                </div>
+
+            </div>
+
+            <!--
+            <div class="row justify-content-center">
+                <div class="col-md-4 text-center">
+                    <div class="pWordFrame">
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col text-center">
+                    <input type="button" onclick="fGoHome()" value="Exit">
+                    <input type="button" onclick="fPlayAgain()" value="Play again">
+                </div>
+            -->
+            </div>
+        </div>
+
+
 
 {% endblock %}
