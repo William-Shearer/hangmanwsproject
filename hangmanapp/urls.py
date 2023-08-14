@@ -9,7 +9,7 @@ urlpatterns = [
     path("game", views.game, name = "game"),
     # API
     path("fetchword", views.fetch_word, name = "fetchword"),
-    path("puthistory/<int:word_id>", views.put_history, name = "puthistory"),
+    path("puthistory", views.put_history, name = "puthistory"),
     # ERRORS
     path("error", views.general_error, name = "error")
 ]

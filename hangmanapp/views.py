@@ -4,12 +4,13 @@ from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
 from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 import json
-from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
-from django.core.exceptions import ObjectDoesNotExist
-from random import randint
-# from .functions import *
+# from django.core.files.base import ContentFile
+# from django.core.files.storage import default_storage
+# from django.core.exceptions import ObjectDoesNotExist
+# from random import randint
+from .functions import *
 from .models import *
 from .forms import *
 
@@ -41,12 +42,16 @@ def login_view(request):
         else:
             context = {"form": LoginForm, "message": "Incorrect login credentials."}
             return render(request, "hangmanapp/login.html", context = context)
+    else:
+        return HttpResponse("<h1>Error: Only GET and POST requests here.</h1>")
     
-
+@login_required
 def logout_view(request):
     if request.method == "GET":
         logout(request)
-        return redirect(reverse("login"))
+        return redirect(reverse("home"))
+    else:
+        return HttpResponse("<h1>Error: Should not have a POST request.</h1>")
 
 
 def register_view(request):
@@ -86,14 +91,11 @@ def register_view(request):
 
 def home_page(request):
     if request.method == "GET":
-        if not request.user.is_authenticated:
-            return redirect(reverse("login"))
-        else:
-            return render(request, "hangmanapp/home.html")
+        return render(request, "hangmanapp/home.html")
     else:
         return HttpResponse("<h1>Error: Should not have a POST request.</h1>")
 
-
+@login_required
 def game(request):
     if request.method == "GET":
         return render(request, "hangmanapp/game.html")
@@ -107,7 +109,8 @@ def general_error(request):
 
 def fetch_word(request):
     if request.method == "GET":
-        if word_select := get_last_user_word(request.user):
+        #if word_select := get_last_user_word(request.user):
+        if word_select := get_word(request.user):
             """
             Note: get_last_user_word returns an existing word in the DB
             or otherwise creates a new one. Failure of either will return False.
@@ -115,7 +118,7 @@ def fetch_word(request):
             treated as a JavaScript object.
             The keys here are used in JavaScript to get the object elements.
             """
-            print(word_select.word)
+            # print(word_select.word)
             word_data = {
                 "id": word_select.id,
                 "user": request.user.username,
@@ -124,9 +127,10 @@ def fetch_word(request):
                 "hits": word_select.hits,
                 "misses": word_select.misses,
                 "usedLetters": word_select.used_letters,
-                "complete": word_select.complete
+                "complete": word_select.complete,
+                "won": word_select.won
             }
-            print(word_data["usedLetters"])
+            # print(word_data["usedLetters"])
             return JsonResponse(word_data)
         else:
             print("ERROR: No way, no how. Word not found. Anywhere.")
@@ -147,16 +151,17 @@ def fetch_word(request):
     
 
 @csrf_exempt
-def put_history(request, word_id):
+def put_history(request):
     if request.method == "PUT":
         try:
             wObj_data = json.loads(request.body)
-            word_DB = UserWordHistory.objects.get(id = word_id)
+            word_DB = UserWordHistory.objects.get(id = wObj_data["id"])
             word_DB.player_word = wObj_data["playerWord"]
             word_DB.hits = wObj_data["hits"]
             word_DB.misses = wObj_data["misses"]
             word_DB.used_letters = wObj_data["usedLetters"]
             word_DB.complete = wObj_data["complete"]
+            word_DB.won = wObj_data["won"]
             word_DB.save()
             return HttpResponse("DONE")
         except IntegrityError as error:
@@ -166,39 +171,3 @@ def put_history(request, word_id):
         print("ERROR: Something other than PUT was attempted in put_history")
         return HttpResponse("ERROR: This is only a PUT function.")
     
-
-
-def create_new_word():
-    """
-    Notes in previous version of get_word apply. The only difference is that
-    the word is now returned as a string, and not converted to a Python list.
-    """
-    
-    with default_storage.open("wordbank/nouns_en.txt") as wordfile:
-        words = wordfile.read().decode().split()
-        word = words[randint(0, len(words) - 1)]            
-        return word
-
-
-def get_last_user_word(user):
-    try:
-        if word_query := UserWordHistory.objects.filter(user = user, complete = False).order_by("id").last():
-            return word_query
-        
-    except:
-        print("Query does not exist, creating new word.")
-        
-    try:
-        word = create_new_word()
-    except:
-        print("Could not create new word.")
-        return False
-    else:
-        word_query = UserWordHistory.objects.create(
-            user = user,
-            word = word,
-            player_word = "_" * len(word),
-            used_letters = ""
-        )
-                
-        return word_query

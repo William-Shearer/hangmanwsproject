@@ -2,12 +2,49 @@
 
 {% block title %}Home{% endblock %}
 
+{% block head %}
+    {% load static %}
+    
+    <link rel="stylesheet" href="{% static 'hangmanapp/gamestyles.css' %}">
+
+{% endblock %}
 
 {% block body %}
 
-    <h1>Logged in: {{ request.user.username }}</h1>
-    <a href="{% url 'logout' %}">Log Out</a>
-    <br>
-    <a href="{% url 'game' %}">Play Game</a>
+    
+    <div class="container-md justify-content-center border border-primary rounded my-1" style="background-color: antiquewhite;">
+        <div class="row justify-content-center align-items-center m-1 py-3">
+            <div class="col-12 col-lg-6 p-1">
+                <div class="bg-light p-2 rounded border border-dark"> 
+                    <h1 class="fw-bold text-primary">Hangman Challenge</h1>
+                    {% if request.user.is_authenticated %}
+                        <p class="lead" style="text-align: justify;"><span class="fw-bold display-6">H</span>ello, <b>{{ request.user.username }}</b>!</p>
+                    {% else %}
+                        
+                        <p class="lead" style="text-align: justify;"><span class="fw-bold display-6">W</span>elcome to the Hangman Challenge</p>
+                        <p style="text-align: justify;">Improve your vocabulary and compete against other spelling gurus for the first place in <b>Expert Level</b>.</p>
+                        <p style="text-align: justify;">The rules are simple. Just play <b>Hangman</b>! Figure out each word with as few incorrect guesses as possible. You may miss up to six letters before losing the round, but the less you miss, the better your score will be.</p> 
+                        <p style="text-align: justify;"><a href="{% url 'login' %}">Log in</a> or <a href="{% url 'register' %}">register</a> for an account, so that your scores may be preserved, and play away!</p>
+                    {% endif %}
+                    <h6 class="fw-bolder text-decoration-underline">Levels</h6>
+                    <ul>
+                        <li><i><b>Sampler:</b></i> 1 to 10 words</li>
+                        <li><i><b>Interested:</b></i> 11 to 50 words</li>
+                        <li><i><b>Dedicated:</b></i> 51 to 250 words</li>
+                        <li><i><b>Addicted:</b></i> 251 to 500 words</li>
+                        <li><i><b>Expert:</b></i> +501 words</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6 p-1">
+                <div class="bg-light p-2 rounded border border-dark">
+                    <h1 class="fw-bold text-primary">Hangman Leaderboard</h1>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
 
 {% endblock %}

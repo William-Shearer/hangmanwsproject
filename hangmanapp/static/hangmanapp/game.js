@@ -1,10 +1,19 @@
 const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
 
-
 document.addEventListener("DOMContentLoaded",
-    function()
+    async function()
     {
-        fGameInitiate();
+        let wObj = await fGameInitiate();
+        if (wObj === false)
+        {
+            console.log("FAILED");
+        }
+        else
+        {
+            console.log("SUCCEEDED");
+            console.log(`Word is: ${wObj.word}`);
+            fGameLoop(wObj);
+        };
     }
 );
 
@@ -33,92 +42,69 @@ async function fGameInitiate()
         {
             console.log(response.status);
             const dataWord = await response.json();
-            fGameLoop(dataWord);
+            return dataWord;
         }
         else
         {
             console.log(`RESPONSE ERROR: ${response.status}`);
+            return false;
         };
     }
     catch (error)
     {
         console.log(`NETWORK ERROR: ${error.name}`);
+        return false;
     }
     finally
     {
         clearTimeout(timeOut);
     };
+    
 };
 
-/*
-Take note: The application must be protected against the user reloading the browser.
-That means up in the DOMContentLoaded, the word should be fetched from the Django model,
-if it is incomplete. Else, a new word should be generated. This will have the effect
-of saving a session, too. If the player leaves the game before finishing a word, when
-they come back the same word will be presented for them to resume and complete.
-*/
-
-
-// function fGameLoop(word, pWord, uid, uName) //, h, m)
 function fGameLoop(wObj)
 {
     fDisplayPlayerWord(wObj);
-    console.log(`In Game Loop with word: ${wObj.word}`);
-    const btnFrame = document.querySelector(".btnFrame");
+    fDrawCanvas(wObj.misses);
+    // console.log(`In Game Loop with word: ${wObj.word}`);
+    const btnFrame = document.querySelector("#btnFrame");
     alphabet.forEach(
         function(letter)
         {
             const btn = document.createElement("button");
             btn.style.width = "35px";
-            btn.style.fontweight = "bold";
+            btn.style.color = "blue";
+            // btn.style.fontweight = "bold";
             btn.style.fontSize = "25px";
             btn.style.margin = "5px";
+            btn.style.background = "rgb(139,211,230)";
+            btn.setAttribute("name", "letterButton");
             if (wObj.usedLetters.includes(letter))
             {
-                btn.style.backgroundColor = "red";
+                fButtonDisabled(btn);
             };
             const btnText = document.createTextNode(letter);
             btn.addEventListener("click",
                 function ()
                 {
-                    // Ternary operator a la JavaScript, don't get confused!
-                    // This will alter the pWord if there are hits, incidentally.
                     fCheckLetter(this, letter, wObj) ? wObj.hits++ : wObj.misses++;
-                    console.log(`Hits: ${wObj.hits}`);
-                    console.log(`Missess: ${wObj.misses}`);
 
-                    if (fCheckWordComplete(wObj))
+                    if (fCheckWon(wObj))
                     {
-                        const WinFrame = document.querySelector("h1");
-                        WinFrame.innerHTML = "WON!";
-                        wObj.complete = true;
+                        // The player got yhe word (true)
+                        fEndRound(wObj, true);
+                    }
+                    else if (wObj.misses == 6)
+                    {
+                        // The plater ran out of tries (false)
+                        fEndRound(wObj, false);
                     };
 
-                    console.log(`Is word complete? ${wObj.complete}`);
-
-                    // Object to pass to Django.
-                    // Make an object to pass...
-                    // const dataObject = {playerWord : pWord.join(""), misses: m, hits: h,};
-                    // Don't forget, playerWord must yet be converted to a string. DONE.
-                    fPutWordHistory(wObj, wObj.id);
-
-                    // Game screen updates go here...
-                    // console.log(word.join(""), pWord.join(" "), letter, h, m);
+                    fPutWordHistory(wObj);
                     fDisplayPlayerWord(wObj);
-                    /*
-                    This is the win conditon.
-                    fCheckWordComplete is a function that returns true if all
-                    the blanks of pWord are filled.
-                    At this point, the application should also provide an option to
-                    play again or leave.
-                    */
-                   
-                    
-                   
-                    // console.log(fCheckWordComplete(wObj));
+                    fDrawCanvas(wObj.misses);
                 }
             );
-            // Make the buttons here.
             btn.appendChild(btnText);
             btnFrame.appendChild(btn);
         }
@@ -126,103 +112,99 @@ function fGameLoop(wObj)
 };
 
 
-function fButtonDisabled()
+function fButtonDisabled(btn)
 {
-
+    // btn.style.fontWeight = "normal";
+    btn.style.color = "rgb(120,190,190)";
+    btn.style.background = "rgb(160,230,230)";
+    btn.disabled = true;
 };
 
+function fDisableAllButtons()
+{
+    const buttons = document.querySelectorAll('button[name="letterButton"]');
+    for (let i = 0; i < buttons.length; i++)
+    {
+        // buttons[i].style.fontWeight = "normal";
+        buttons[i].style.color = "rgb(120,190,190)";
+        buttons[i].style.background = "rgb(160,230,230)";
+        buttons[i].disabled = true;
+    };
+};
 
 function fCheckLetter(btn, letter, wObj)
 {
-    // Ghost the button and disable it. Letter is used.
-    btn.style.fontWeight = "normal";
-    btn.disabled = true;
+    fButtonDisabled(btn);
     let contains = false;
-    // Search through the word to find out if the letters in it match.
-    // Local variable of word and pWord, broken up into array...
     let word = wObj.word.split("");
     let pWord = wObj.playerWord.split("");
-    // console.log(typeof letter);
-    console.log(typeof wObj.usedLetters);
-    console.log(letter);
-    // console.log(alphabet);
     for (let i = 0; i < word.length; i++)
     {
         if (word[i] === letter)
         {
-            // That is, the word contains the letter, and it is placed into the playerWord,
-            // at the appropriate place.
             pWord[i] = letter;
             contains = true;
-            // console.log(`Contains ${letter}`);
         };
-        // Otherwise, nothing changes. Now, the reason the above conditional does NOT break
-        // out and return a true immediately it finds a letter is because that letter might happen
-        // more than once in a word.
-        // There is no need to worry about clicking a letter (validly) twice because the button is
-        // disabled for already clicked letters, as seen above.
-        // That has to be catered for, also, in the DOMContentLoaded bit up there.
     };
-    // Save the used letter to the string of wObj.usedLetters
     const savedLetters = wObj.usedLetters + letter;
     wObj.usedLetters = savedLetters;
     console.log(wObj.usedLetters);
-    
-    /* When all the places are checked, merge the playerWord back into a string and
-    assing it back to the object (which is here, present, and can be changed by reference).
-    Then return true or false, as corresponds contains variable.
-    */
     wObj.playerWord = pWord.join("");
-    // console.log(fCheckWordComplete(pWord)); // Ha-haaa! Works...
     return contains;
-    // That is, true or false.
 };
 
-
-function fCheckWordComplete(wObj)
+// This returns true if the word contains no blanks (ie; won).
+function fCheckWon(wObj)
 {
-    // Okay, same story of breaking the pWord into an array...
     let pWord = wObj.playerWord.split("");
-    // Hehe. Exapnded so I know what the devil is going on.
-    // That ES6 hash rocket is so damned confusing!
-    // console.log(`In Check Word Complete ${pWord}`);
-
+    return pWord.every(c => c != "_");
+    /*
+    // Expanded, so I know what it is going up there.
+    // I did it this way first, then rewrote in arrow format, which is confusing the heck out of me.
     return pWord.every(
         function (c)
         {
             return c != "_";
         }
     );
-    
-    /*
-    This is what it would look like...
-    return pWord.every(c => c != "_");
-    I don't find that easier to read. Old school / old guy.
-    I will take my own time getting used to that. Here is the reference, anyhows.
-    But what is it doing?
-    This function returns true if every characteer (c) in pWord is NOT "_".
-    Otherwise, it returns false (meaning, there is still a blank in pWord).
     */
+};
+
+function fEndRound(wObj, won)
+{
+    // const WinFrame = document.querySelector("h1");
+    if (won)
+    {
+        // WinFrame.innerHTML = "WON!";
+        wObj.won = true;
+    }
+    else
+    {
+        // WinFrame.innerHTML = "LOST!";
+    };
+    wObj.complete = true;
+    fDisableAllButtons();
 };
 
 
 function fDisplayPlayerWord(wObj)
 {
     console.log(wObj.playerWord);
-    const pWordFrame = document.querySelector(".pWordFrame");
+    const pWordFrame = document.querySelector("#pWordFrame");
     pWordFrame.innerHTML = "";
     const pWordString = wObj.playerWord.split("").join(" ");
-    const pWordText = document.createTextNode(pWordString);
-    const pWordElement = document.createElement("h1");
-    pWordElement.appendChild(pWordText);
-    pWordFrame.appendChild(pWordElement);
+    pWordFrame.innerHTML = pWordString;
+    // const pWordText = document.createTextNode(pWordString);
+    // const pWordElement = document.createElement("h1");
+    // pWordElement.appendChild(pWordText);
+    // pWordFrame.appendChild(pWordElement);
 };
 
 
-async function fPutWordHistory(wObj, word_id)
+async function fPutWordHistory(wObj)
 {
     const controller = new AbortController();
-    const url = "puthistory/" + word_id;
+    const url = "puthistory";
     console.log(url);
     const timeOut = setTimeout(
         function ()
@@ -258,5 +240,103 @@ async function fPutWordHistory(wObj, word_id)
     finally
     {
         clearTimeout(timeOut);
+    };
+};
+
+
+function fDrawCanvas(misses)
+{
+    console.log("Drawing canvas");
+    const canvas = document.querySelector("#gameCanvas");
+    const cWidth = canvas.scrollWidth;
+    const cHeight = canvas.scrollHeight;
+    console.log(`Canvas W H: ${cWidth}, ${cHeight}`);
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, cWidth, cHeight);
+    // ctx.fillStyle = "rgb(250, 235, 215)";
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 3;
+
+    ctx.beginPath();
+    ctx.moveTo(10, 310);
+    ctx.lineTo(10, 10);
+    ctx.lineTo(145, 10);
+    ctx.lineTo(145, 15);
+    ctx.lineTo(50, 15);
+    ctx.lineTo(15, 50);
+    ctx.lineTo(15, 310);
+    ctx.moveTo(14, 15);
+    ctx.lineTo(43, 15);
+    ctx.lineTo(15,43);
+    ctx.lineTo(15, 14);
+    ctx.moveTo(135, 15);
+    ctx.lineTo(135, 40);
+    ctx.moveTo(2, 310);
+    ctx.lineTo(230, 310);
+    ctx.stroke();
+    
+    switch(misses)
+    {
+        case 6:
+            ctx.beginPath();
+            ctx.moveTo(135, 180);
+            ctx.lineTo(173, 295);
+            ctx.stroke();
+        case 5:
+            ctx.beginPath();
+            ctx.moveTo(135, 180);
+            ctx.lineTo(97, 295);
+            ctx.stroke();
+        case 4:
+            ctx.beginPath();
+            ctx.moveTo(135, 100);
+            ctx.lineTo(186, 170);
+            ctx.stroke();
+        case 3:
+            ctx.beginPath();
+            ctx.moveTo(135, 100);
+            ctx.lineTo(89, 170);
+            ctx.stroke();
+        case 2:
+            ctx.beginPath();
+            ctx.moveTo(135, 90);
+            ctx.lineTo(135, 180);
+            ctx.stroke();
+        case 1:
+            ctx.beginPath();
+            ctx.arc(135, 65, 25, 0, Math.PI * 2);
+            ctx.stroke();
+            if (misses < 6)
+            { 
+                ctx.strokeRect(124, 58, 2, 2);
+                ctx.strokeRect(145, 58, 2, 2);
+                ctx.beginPath();
+                ctx.moveTo(123, 78);
+                ctx.lineTo(147, 78);
+                ctx.stroke();
+            }
+            else
+            {
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(120, 54);
+                ctx.lineTo(128, 62)
+                ctx.moveTo(120, 62);
+                ctx.lineTo(128, 54);
+                ctx.moveTo(141, 54);
+                ctx.lineTo(150, 62);
+                ctx.moveTo(141, 62);
+                ctx.lineTo(150, 54);
+                ctx.stroke();
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(129, 78, 6, Math.PI, 0);
+                ctx.arc(141, 78, 6, Math.PI, 0, true);
+                ctx.stroke();
+            }
+            break;
+
+        default:
+            break;
     };
 };
