@@ -340,3 +340,4 @@ function fDrawCanvas(misses)
             break;
     };
 };
+
