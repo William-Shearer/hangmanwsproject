@@ -1,8 +1,12 @@
+// Here are a couple of ways of making arrays on the fly, for reference.
 const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
+const congratulations = ["Well done!", "Awesome!", "Good job!", "Excellent!", "Great work!", "Fantastic!", "You got it!", "Cool!"];
+const conmiserations = ["Too bad.", "Bad luck.", "So sorry.", "Awww!", "Next time.", "Keep trying.", "Tough!", "Nice try!"]
 
 document.addEventListener("DOMContentLoaded",
     async function()
     {
+        document.querySelector("#scoreFrame").style.display = "none";
         let wObj = await fGameInitiate();
         if (wObj === false)
         {
@@ -91,7 +95,7 @@ function fGameLoop(wObj)
 
                     if (fCheckWon(wObj))
                     {
-                        // The player got yhe word (true)
+                        // The player got the word (true)
                         fEndRound(wObj, true);
                     }
                     else if (wObj.misses == 6)
@@ -172,17 +176,44 @@ function fCheckWon(wObj)
 
 function fEndRound(wObj, won)
 {
+    const hFrame = document.querySelector("#headFrame");
+    const pFrame = document.querySelector("#pWordFrame");
+    const sFrame = document.querySelector("#scoreFrame");
+    const sWord = document.querySelector("#scoreWord");
+    let score = 0;
     // const WinFrame = document.querySelector("h1");
+    let caption = "";
     if (won)
     {
-        // WinFrame.innerHTML = "WON!";
+        hFrame.innerHTML = `${congratulations[Math.floor(Math.random() * congratulations.length)]}`;
         wObj.won = true;
+        score = Math.round((wObj.hits / (wObj.hits + wObj.misses)) * 100);
     }
     else
     {
-        // WinFrame.innerHTML = "LOST!";
+        hFrame.innerHTML = `${conmiserations[Math.floor(Math.random() * conmiserations.length)]}`;
     };
     wObj.complete = true;
+    // RUN THE Animation.
+    pFrame.addEventListener("animationend",
+        function ()
+        {
+            pFrame.remove();
+            if (wObj.won)
+            {
+                sWord.innerHTML = `You scored: ${score}%`;
+            }
+            else
+            {
+                sWord.innerHTML = `Word: ${wObj.word}`;
+            };
+            sFrame.style.display = "block";
+        }
+    );
+    hFrame.style.animationPlayState = "running";
+    pFrame.style.animationPlayState = "running";
+
+
     fDisableAllButtons();
 };
 

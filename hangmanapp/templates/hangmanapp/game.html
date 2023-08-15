@@ -20,42 +20,71 @@
 
 {% block body %}
 
-<div id="dspFrame" class="container-md justify-content-center align-items-center border border-primary rounded my-1">
+    <div id="dspFrame" class="container-md justify-content-center align-items-center my-1">
 
-            <div class="row justify-content-center align-items-center m-1 py-3">
-
-                <div class="col-12 col-md-5 order-1 text-center">
-                    <canvas id="gameCanvas" width="270" height="320"></canvas>
+        <div class="row">
+            <div class="col"> 
+                <div id="headFrame" class="border border-primary rounded pb-1">
                 </div>
-                
-                <div class="col-12 col-sm-10 col-md-6 col-lg-5 order-3 order-md-2 py-3 px-2 text-center">
-                    <div id="btnFrame"></div>
-                </div>
-
-                <div class="col-12 col-lg-6 col-md-8 col-sm-10 col-xs-12 order-2 order-md-3">
-                    <h1 id="pWordFrame" class="display-3 text-center"></h1>
-                </div>
-
             </div>
+        </div>
 
-            <!--
-            <div class="row justify-content-center">
-                <div class="col-md-4 text-center">
-                    <div class="pWordFrame">
-                        
-                    </div>
-                </div>
+        <div class="row justify-content-center align-items-center m-1 py-3">
+
+            <div class="col-12 col-md-5 order-1 text-center">
+                <canvas id="gameCanvas" width="270" height="320"></canvas>
             </div>
             
-            <div class="row">
-                <div class="col text-center">
-                    <input type="button" onclick="fGoHome()" value="Exit">
-                    <input type="button" onclick="fPlayAgain()" value="Play again">
+            <div class="col-12 col-sm-10 col-md-6 col-lg-4 col-xl-4 order-3 order-md-2 py-3 px-2 text-center">
+                <div id="btnFrame"></div>
+            </div>
+
+            <div class="col-12 col-lg-6 col-md-8 col-sm-10 col-xs-12 order-2 order-md-3">
+                <h1 id="pWordFrame" class="display-3 text-center"></h1>
+            </div>
+
+        </div>
+
+        <div id="scoreFrame" class="row">
+            <div class="col">
+                <div class="row">
+                    <div id="scoreWord"></div>
                 </div>
-            -->
+                <div class="row">
+                    <div class="col">
+                        <input class="formBtn mt-1 mb-2" type="button" value="Play again" onclick="fPlayAgain()">
+                        <input class="formBtn mt-1 mb-2" type="button" value="Quit" onclick="fGoHome()">
+                    </div>
+                </div>                
             </div>
         </div>
 
 
+        <!--
+        <div id="scoreCol" class="row mt-1">
+            <div class="col-12"> 
+                <div id="scoreFrame" class="border border-primary rounded">
+                    
+                </div>
+            </div>
+        </div>
+        -->
+    </div>
+    <!--
+        <div class="row">
+            <div class="col"> 
+                <div id="footFrame" class="border border-primary rounded pb-1">
+                    <h1>Hello!</h1>
+                </div>
+            </div>
+        </div>
+
+
+
+    <div id="footFrame" class="container-md justify-content-center align-items-center my-1">
+        Hello
+
+    </div>
+    -->
 
 {% endblock %}

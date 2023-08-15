@@ -16,10 +16,10 @@ class LoginForm(ModelForm):
 Here is a standard one, to not forget.
 """
 class RegisterForm(forms.Form):
-    username = forms.CharField(label = "User Name", max_length = 50, required = True, widget = forms.TextInput(attrs = {"autofocus": True}))
-    first_name = forms.CharField(label = "First Name", max_length = 50, required = False, widget = forms.TextInput())
-    last_name = forms.CharField(label = "Last Name", max_length = 50, required = False, widget = forms.TextInput())
-    email = forms.EmailField(label = "e-mail", required = True, widget = forms.EmailInput())
-    password = forms.CharField(label = "Password", max_length = 50, required = True, widget = forms.PasswordInput())
-    confirmation = forms.CharField(label = "Confirm Password", max_length = 50, required = True, widget = forms.PasswordInput())
+    username = forms.CharField(label = "User Name * ", max_length = 50, required = True, widget = forms.TextInput(attrs = {"autofocus": True}))
+    first_name = forms.CharField(label = "First Name ", max_length = 50, required = False, widget = forms.TextInput())
+    last_name = forms.CharField(label = "Last Name ", max_length = 50, required = False, widget = forms.TextInput())
+    email = forms.EmailField(label = "e-mail * ", required = True, widget = forms.EmailInput())
+    password = forms.CharField(label = "Password * ", max_length = 50, required = True, widget = forms.PasswordInput())
+    confirmation = forms.CharField(label = "Confirm Password * ", max_length = 50, required = True, widget = forms.PasswordInput())
 

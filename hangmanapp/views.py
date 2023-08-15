@@ -40,7 +40,7 @@ def login_view(request):
             login(request, user)
             return redirect(reverse("home"))
         else:
-            context = {"form": LoginForm, "message": "Incorrect login credentials."}
+            context = {"form": LoginForm, "message": "Incorrect login credentials"}
             return render(request, "hangmanapp/login.html", context = context)
     else:
         return HttpResponse("<h1>Error: Only GET and POST requests here.</h1>")

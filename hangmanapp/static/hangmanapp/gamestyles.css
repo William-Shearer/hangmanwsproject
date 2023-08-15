@@ -1,7 +1,66 @@
+#frontFrame
+{
+    background-color: antiquewhite;
+    border: 1px solid  #2e86c1;
+    border-radius: 5px;
+    padding: 0.5rem;
+    margin-top: 0.25rem;
+    min-height: 89vh;
+}
+
 #dspFrame
 {
     background-image: linear-gradient(#d6eaf8 , #fef9e7, #fdebd0);
     border: 1px solid  #2e86c1;
+    border-radius: 5px;
+    padding: 0.5rem;
+    min-height: 89vh;
+}
+
+@keyframes show-result
+{
+    0%
+    {
+        opacity: 0;
+        font-size: 0rem;
+        color: rgb(255, 251, 219);
+        text-shadow: 0px 0px 0px #850404;
+    }
+    100%
+    {
+        opacity: 1;
+        color: yellow;
+        font-size: 3rem;
+        text-shadow: 4px 4px 3px #a70505e0;
+    }
+}
+
+#headFrame
+{
+    background-image: linear-gradient( #f5b7b1 ,  #fad7a0,  #f5b7b1);
+    border: 1px solid  #2e86c1;
+    /*font-size: 3rem;*/
+    color: yellow;
+    /*text-shadow: 2px 2px 4px #ff0000;*/
+    text-align: center;
+    font-weight: bold;
+    box-shadow: 4px 4px 2px #aaa;
+    -webkit-text-fill-color: yellow;
+    -webkit-text-stroke-width: 0.1rem;
+    -webkit-text-stroke-color: rgb(99, 92, 3);
+    animation-name: show-result;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    animation-play-state: paused;
+}
+
+
+#footFrame
+{
+    background-image: linear-gradient(#d6eaf8 , #fef9e7, #fdebd0);
+    border: 1px solid  #2e86c1;
+    border-radius: 5px;
+    /*padding: 0.5rem;*/
 }
 
 #btnFrame
@@ -12,10 +71,84 @@
     padding: 0.5rem;
 }
 
+@keyframes hide-pWordFrame
+{
+    0%
+    {
+        opacity: 1;
+    }
+    100%
+    {
+        opacity: 0;
+    }
+}
+
 #pWordFrame
 {
     background-color: white;
     border: 1px solid  #2e86c1;
     border-radius: 10px;
     padding: 0.5rem;
+    margin-top: 1.5rem;
+    animation-name: hide-pWordFrame;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    animation-play-state: paused;
 }
+
+#scoreFrame
+{
+    background-image: linear-gradient( #b1d6f5 ,  #d2e6f7,  #b1d6f5);
+    border: 1px solid  #2e86c1;
+    text-align: center;
+    box-shadow: 4px 4px 2px #aaa;
+    margin-left: 0.2rem;
+    margin-right: 0.2rem;
+    border-radius: 5px;
+}
+
+#scoreWord
+{
+    font-size: 2.7rem;
+    color: rgb(0, 255, 191);
+    text-shadow: 2px 2px 4px #00438f;
+    font-weight: bold;
+    -webkit-text-fill-color: yellow;
+    -webkit-text-stroke-width: 0.1rem;
+    -webkit-text-stroke-color: rgb(99, 92, 3);
+}
+
+#formFrame
+{
+    height: 89vh;
+    background-image: linear-gradient(#d6eaf8 ,  #e8daef , #d6eaf8);
+    border: 1px solid  #2e86c1;
+    border-radius: 15px;
+    padding: 0.5rem;
+}
+
+input.formBtn
+{
+    background-color: #e8daef;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    border: 1px solid #6e3a88;
+    border-radius: 0.2rem;
+    box-shadow: 2px 2px #aaa;
+    color: black;
+    min-width: 8rem;
+}
+
+input.formBtn:hover
+{
+    background-color: #dab8eb;
+}
+
+input.formBtn:active
+{
+    background-color: #b760e2;
+    color: white;
+}
+
