@@ -226,8 +226,4 @@ def clean_censor():
         for word in new_list:
             file.write(word + " ")
 
-
-def get_win_ratio():
-    records = UserWordHistory.objects.all()
-    users = User.objects.all()
-            
+          

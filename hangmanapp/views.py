@@ -180,38 +180,65 @@ def put_history(request):
 def put_score(request):
     """
     Some notes on this function. This is called via a fetch request from JavaScript frontend.
-    It is called BEFORE the history is posted, via the fEndRound function. Therefore,
-    it is VERY important that the new data be passed to this function because it does NOT
-    exist completely in the database yet (that is, the last puthistory for the word has not been 
-    called yet, and the word is not marked as complete).
+    It is paramount that this be called AFTER the word history has been posted for the round.
+    Any funny score results, ever, the first thing to check is that this order was not
+    accidentally altered. Look in the game.js JavaScript file, for that.
+    Almost worth making another fetch block over in the JavaScript game.js, but
+    I weigh up the following. wObj is not used here, but is passed, anyway. Wasted effort.
+    On the other hand, adding another function in JavaScript injects more
+    probability of bugs and errors by lengthening the code. Therefore,
+    I opt for the latter, as those two points (bugs and long code)
+    outweigh the wasted shot of reuse.
+    ---
+    Filtering only the won == true words to get the win_efficiency.
+    CAUTION. There is always the possibility that a user has not won any word, yet. This will undoubtedly
+    cause a foreseeable problem, as in that case won words will return a count of 0. 
+    Any operations on this query set will return None. This is an exception that will need to be handled. 
+    Check the queryset count. If it is 0 bypass the calculation for ratio and efficiency. 
+    ---
+    A risk of division by zero? Should not happen. This procedure is called after the word history
+    database is updated, so even if it is the user's first word in their history, all_words should 
+    be at least 1 by the time we get here. Any division by zero problems, or strange None errors,
+    look here, or check the order of calling in game.js, as mentioned above.
+    ---
+    There are two Django options for getting counts. Both are useful, and indeed,
+    each would have their use for specific cases:
+    -
+    user_word_records.filter(won = True).aggregate(Count("word"))["word__count"]
+    -
+    or...
+    -
+    user_word_records.count()
+    -
+    The aggregate method has quite a specific use, where .count() is a quick general method.
+    Note, aggregate actually singles out a specific attribute in the model. Useful.
+    Look carefully at the aggregate method, however.
+    Using aggregate. It returns a dict object, rather curiously, and not the number.
+    The key to the value is the attribute with a dunder and the operation done, lowercase.
+    Weird, but there you go. It is immediately accessible in a one-liner.
     """
     if request.method == "PUT":
         try:
-            # Vestigial, blank duff shot (no worries) - wObj_data = json.loads(request.body)
-            # Almost worth making another fetch block over in the JavaScript game.js, but
-            # I weigh up the following. wObj is not used here, but is passed. Wasted effort.
-            # On the other hand, adding another function in JavaScript injects more
-            # probability of bugs and errors by lengthening the code. Therefore,
-            # I opt for the latter, as those two points (bugs and long code)
-            # outweigh the wasted shot.
             user_word_records = UserWordHistory.objects.filter(user = request.user)
             score_DB = UserScoreCard.objects.get(user = request.user)
-            # Doing this from scratch, instead of averaging, to avoid creeping floating point issues over time.
-            all_won = user_word_records.filter(won = True).aggregate(Count("word"))["word__count"]
-            all_words = user_word_records.aggregate(Count("word"))["word__count"]
-            score_DB.win_ratio = round((all_won / all_words) * 100)
-            # Now filtering only the won == true words to get the win_efficiency.
-            win_words = user_word_records.filter(won = True)
-            # Note on using aggregate. It returns a dict object, rather curiously, and not the number.
-            # The key to the value is the attribute with a dunder and the operation done, lowercase.
-            # Weird, but there you go. It is immediately accessible.
-            win_hits = win_words.aggregate(Sum("hits"))["hits__sum"]
-            win_misses = win_words.aggregate(Sum("misses"))["misses__sum"]
-            # Not that it matters, but the Python floor division could have been used for this
-            # instead of round, with very little difference (1% at best).
-            score_DB.win_efficiency = round((win_hits / (win_hits + win_misses)) * 100)
+            
+            score_DB.word_count = user_word_records.count() # That is, all_words count
+
+            all_won = user_word_records.filter(won = True) # Returns a queryset, regardless if empty.
+            
+            if all_won.count() != 0:
+                score_DB.win_ratio = round((all_won.count() / user_word_records.count()) * 100)
+                win_hits = all_won.aggregate(Sum("hits"))["hits__sum"]
+                win_misses = all_won.aggregate(Sum("misses"))["misses__sum"]
+                score_DB.win_efficiency = round((win_hits / (win_hits + win_misses)) * 100)
+            else:
+                # If the user ain't won anything, he don't get anything. Right?
+                score_DB.win_ratio = 0
+                score_DB.win_efficiency = 0
+
             score_DB.save()
             return HttpResponse("DONE")
+        
         except Exception as error:
             print(f"ERROR: {error}")
             return HttpResponse("ERROR putting Score")

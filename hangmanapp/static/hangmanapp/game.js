@@ -129,7 +129,7 @@ function fGameLoop(wObj)
                     score that is eternally one step behind.
                     There is more on this over in the put_score function in views.py.
                     */
-                    if(fCheckWon(wObj) || wObj.misses === 6)
+                    if(fCheckWon(wObj) || wObj.misses == 6)
                     {
                         fPutWordHistory(wObj, "putuserscore");
                     }

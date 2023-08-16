@@ -42,9 +42,21 @@ class UserScoreCard(models.Model):
     user = models.OneToOneField(User, on_delete = models.CASCADE)
     win_ratio = models.PositiveSmallIntegerField(default = 0)
     win_efficiency = models.PositiveSmallIntegerField(default = 0)
+    word_count = models.PositiveIntegerField(default = 0)
 
     def __str__(self):
-        return f"ScoreCard for {self.user.username}"
+        return f"ScoreCard for {self.user.username} with {self.word_count} words"
     
 
- 
+class GuestBook(models.Model):
+    """
+    Only one signature per user is permitted, so the use of OnToOneField is ideal 
+    to control that by default.
+    """
+    user = models.OneToOneField(User, on_delete = models.CASCADE)
+    comment = models.TextField()
+    created = models.DateTimeField(auto_now = False, auto_now_add = True)
+
+    def __str__(self):
+        return f"Guestbook entry for {self.user.username} on {self.created.strftime('%Y %m %d')}"
+    
