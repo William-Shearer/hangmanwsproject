@@ -10,6 +10,9 @@
 
 #dspFrame
 {
+    /* New thing. scroll anchoring. Need this to ensure the container does not
+    try any silly business when the win/lose message animation plays. */
+    overflow-anchor: none;
     background-image: linear-gradient(#d6eaf8 , #fef9e7, #fdebd0);
     border: 1px solid  #2e86c1;
     border-radius: 5px;

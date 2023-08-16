@@ -6,6 +6,7 @@ from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 import json
+from django.db.models import Sum, Count
 # from django.core.files.base import ContentFile
 # from django.core.files.storage import default_storage
 # from django.core.exceptions import ObjectDoesNotExist
@@ -73,6 +74,7 @@ def register_view(request):
                     user.first_name = first_name
                     user.last_name = last_name
                     user.save()
+                    UserScoreCard.objects.create(user = user)
                 except IntegrityError:
                     context = {"form": RegisterForm, "message": "User already exists"}
                     return render(request, "hangmanapp/register.html", context = context)
@@ -151,6 +153,7 @@ def fetch_word(request):
     
 
 @csrf_exempt
+@login_required
 def put_history(request):
     if request.method == "PUT":
         try:
@@ -170,4 +173,51 @@ def put_history(request):
     else:
         print("ERROR: Something other than PUT was attempted in put_history")
         return HttpResponse("ERROR: This is only a PUT function.")
+    
+
+@csrf_exempt
+@login_required
+def put_score(request):
+    """
+    Some notes on this function. This is called via a fetch request from JavaScript frontend.
+    It is called BEFORE the history is posted, via the fEndRound function. Therefore,
+    it is VERY important that the new data be passed to this function because it does NOT
+    exist completely in the database yet (that is, the last puthistory for the word has not been 
+    called yet, and the word is not marked as complete).
+    """
+    if request.method == "PUT":
+        try:
+            # Vestigial, blank duff shot (no worries) - wObj_data = json.loads(request.body)
+            # Almost worth making another fetch block over in the JavaScript game.js, but
+            # I weigh up the following. wObj is not used here, but is passed. Wasted effort.
+            # On the other hand, adding another function in JavaScript injects more
+            # probability of bugs and errors by lengthening the code. Therefore,
+            # I opt for the latter, as those two points (bugs and long code)
+            # outweigh the wasted shot.
+            user_word_records = UserWordHistory.objects.filter(user = request.user)
+            score_DB = UserScoreCard.objects.get(user = request.user)
+            # Doing this from scratch, instead of averaging, to avoid creeping floating point issues over time.
+            all_won = user_word_records.filter(won = True).aggregate(Count("word"))["word__count"]
+            all_words = user_word_records.aggregate(Count("word"))["word__count"]
+            score_DB.win_ratio = round((all_won / all_words) * 100)
+            # Now filtering only the won == true words to get the win_efficiency.
+            win_words = user_word_records.filter(won = True)
+            # Note on using aggregate. It returns a dict object, rather curiously, and not the number.
+            # The key to the value is the attribute with a dunder and the operation done, lowercase.
+            # Weird, but there you go. It is immediately accessible.
+            win_hits = win_words.aggregate(Sum("hits"))["hits__sum"]
+            win_misses = win_words.aggregate(Sum("misses"))["misses__sum"]
+            # Not that it matters, but the Python floor division could have been used for this
+            # instead of round, with very little difference (1% at best).
+            score_DB.win_efficiency = round((win_hits / (win_hits + win_misses)) * 100)
+            score_DB.save()
+            return HttpResponse("DONE")
+        except Exception as error:
+            print(f"ERROR: {error}")
+            return HttpResponse("ERROR putting Score")
+
+    else:
+        print("ERROR. Check the put_score function.")
+        return HttpResponse("ERROR: Not a PUT request putting score")
+
     

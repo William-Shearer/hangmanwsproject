@@ -15,7 +15,9 @@ document.addEventListener("DOMContentLoaded",
         else
         {
             console.log("SUCCEEDED");
-            console.log(`Word is: ${wObj.word}`);
+            // Huh, huh. Yeah, don't show them that in the console. :D
+            // Take this out on the final deployed version.
+            // console.log(`Word is: ${wObj.word}`);
             fGameLoop(wObj);
         };
     }
@@ -24,6 +26,14 @@ document.addEventListener("DOMContentLoaded",
 
 async function fGameInitiate()
 {
+    /*
+    Strangely familiar with this now, but it was a huge issue the first time I saw it.
+    No comments necessary, except that I finally got to the bottom of returning data
+    from a fetch async. Look down a bit to see the explanation.
+    Just again, I DO prefer doing this as an expanded function because the timeout abort
+    is plainly obvious to see and implement. It is not so obvious how to implement a 
+    timeout with chained promises, and I find very little about it.
+    */
     const controller = new AbortController();
     const url = "fetchword";
     const timeOut = setTimeout(
@@ -46,6 +56,9 @@ async function fGameInitiate()
         {
             console.log(response.status);
             const dataWord = await response.json();
+            // Here is how to return data from an async fetch.
+            // This busted my brain for a while, so don't forget it.
+            // Note that the errors return flase, instead.
             return dataWord;
         }
         else
@@ -95,16 +108,31 @@ function fGameLoop(wObj)
 
                     if (fCheckWon(wObj))
                     {
-                        // The player got the word (true)
+                        // The player got the word (send true)
                         fEndRound(wObj, true);
                     }
                     else if (wObj.misses == 6)
                     {
-                        // The plater ran out of tries (false)
+                        // The player ran out of tries (send false)
                         fEndRound(wObj, false);
                     };
 
-                    fPutWordHistory(wObj);
+                    fPutWordHistory(wObj, "puthistory");
+                    /*
+                    Slightly inefficient re-use of fCheckWon. However,
+                    it is imperative that the word be completed in the DB before
+                    calling the putscore function (which itself is a re-use of the
+                    fPutWordHistory function with a different Django url, so that is
+                    not ineffiecient. Quite the contrary, actually), otherwise the
+                    score would be calculated on an incomplete word that was just,
+                    in fact, completed in reality. In other words, it would result in a
+                    score that is eternally one step behind.
+                    There is more on this over in the put_score function in views.py.
+                    */
+                    if(fCheckWon(wObj) || wObj.misses === 6)
+                    {
+                        fPutWordHistory(wObj, "putuserscore");
+                    }
                     fDisplayPlayerWord(wObj);
                     fDrawCanvas(wObj.misses);
                 }
@@ -182,7 +210,7 @@ function fEndRound(wObj, won)
     const sWord = document.querySelector("#scoreWord");
     let score = 0;
     // const WinFrame = document.querySelector("h1");
-    let caption = "";
+    // Vestigial let caption = "";
     if (won)
     {
         hFrame.innerHTML = `${congratulations[Math.floor(Math.random() * congratulations.length)]}`;
@@ -194,6 +222,12 @@ function fEndRound(wObj, won)
         hFrame.innerHTML = `${conmiserations[Math.floor(Math.random() * conmiserations.length)]}`;
     };
     wObj.complete = true;
+    
+    // Update the UserScoreCard...
+    // fPutWordHistory(wObj, "putuserscore");
+    // Done somewhere else, now. Doing this here would have
+    // injected a score error.
+
     // RUN THE Animation.
     pFrame.addEventListener("animationend",
         function ()
@@ -212,7 +246,7 @@ function fEndRound(wObj, won)
     );
     hFrame.style.animationPlayState = "running";
     pFrame.style.animationPlayState = "running";
-
+    // All good fun!
 
     fDisableAllButtons();
 };
@@ -232,10 +266,11 @@ function fDisplayPlayerWord(wObj)
 };
 
 
-async function fPutWordHistory(wObj)
+async function fPutWordHistory(wObj, putUrl)
 {
     const controller = new AbortController();
-    const url = "puthistory";
+    // const url = "puthistory"; // Superseded.
+    const url = putUrl;
     console.log(url);
     const timeOut = setTimeout(
         function ()
@@ -277,7 +312,8 @@ async function fPutWordHistory(wObj)
 
 function fDrawCanvas(misses)
 {
-    console.log("Drawing canvas");
+    // console.log("Drawing canvas");
+    // Niff naff, I am more than happy with canvas than to go adding a load of comments. Nuff-said.
     const canvas = document.querySelector("#gameCanvas");
     const cWidth = canvas.scrollWidth;
     const cHeight = canvas.scrollHeight;
@@ -308,6 +344,7 @@ function fDrawCanvas(misses)
     
     switch(misses)
     {
+        // Ideal situation for a fall through switch case.
         case 6:
             ctx.beginPath();
             ctx.moveTo(135, 180);
