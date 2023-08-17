@@ -119,7 +119,7 @@ function fGameLoop(wObj)
 
                     fPutWordHistory(wObj, "puthistory");
                     /*
-                    Slightly inefficient re-use of fCheckWon. However,
+                    Slightly inefficient re-use of fCheckWon and fPutWordHistory. However,
                     it is imperative that the word be completed in the DB before
                     calling the putscore function (which itself is a re-use of the
                     fPutWordHistory function with a different Django url, so that is
@@ -129,10 +129,14 @@ function fGameLoop(wObj)
                     score that is eternally one step behind.
                     There is more on this over in the put_score function in views.py.
                     */
+                    /*
+                    // Now suppressed. All much more efficient if it is called conditionally over in Python.
                     if(fCheckWon(wObj) || wObj.misses == 6)
                     {
                         fPutWordHistory(wObj, "putuserscore");
                     }
+                    // All solved.
+                    */
                     fDisplayPlayerWord(wObj);
                     fDrawCanvas(wObj.misses);
                 }
