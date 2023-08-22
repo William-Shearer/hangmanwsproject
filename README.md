@@ -51,9 +51,7 @@ The complexity of this project lies in the "nuts and bolts" implementations behi
   
 ## The AI dilemma  
   
-There is another point of some contemporary controversy that I wish to issue some assurance on, regarding the current "threat" Artificial Intelligence poses to effective, hands on learning. I would be pleased to guarantee that in the creation of this project, absolutely no active assistive AI resources were utilized to generate code, solve coding problems, offer formatting or content assistance, or any other form of intervention that might have supplemented my work and interfered with the process of the acquisition of skills and knowledge. Furthermore, I am positive that upon reviewing the code there will be little doubt that AI was not used. 
-  
-Where I do undoubtedly see the indispensable value of AI in assistive technology for the future, and concede that the use of AI is intelligent on a human level, where intelligence can be defined as the use of efficient means to obtain a desired end, I would reasonably argue that its use for "lightening the load" where any personal learning process is involved is a neglect of the objective of increasing cognitive capacity. In simple terms; it is cheating.
+There is another point of some contemporary controversy that I wish to issue some assurance on, regarding the current "threat" Artificial Intelligence poses to effective, hands on learning. I would be pleased to guarantee that in the creation of this project, absolutely no active assistive AI resources were utilized to generate code, solve coding problems, offer formatting or content assistance, or any other form of intervention that might have supplemented my work and interfered with the process of the acquisition of skills and knowledge. Furthermore, I am positive that upon reviewing the code there will be little doubt that AI was not used.
   
 Stated here in writing. For the record.  
   
