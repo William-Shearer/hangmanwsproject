@@ -251,20 +251,20 @@ def put_score(user):
     Weird, but there you go. It is immediately accessible in a one-liner.
     """
     try:
-        user_word_records = UserWordHistory.objects.filter(user = user)
         score_DB = UserScoreCard.objects.get(user = user)
-        
+        user_word_records = UserWordHistory.objects.filter(user = user)
+        user_won_records = user_word_records.filter(won = True) # Returns a queryset, regardless if empty.
         score_DB.word_count = user_word_records.count() # That is, all_words count
-
-        all_won = user_word_records.filter(won = True) # Returns a queryset, regardless if empty.
-        
-        if all_won.count() != 0:
-            score_DB.win_ratio = round((all_won.count() / user_word_records.count()) * 100)
-            win_hits = all_won.aggregate(Sum("hits"))["hits__sum"]
-            win_misses = all_won.aggregate(Sum("misses"))["misses__sum"]
+        score_DB.won_count = user_won_records.count() # Only won words.
+                
+        # if all_won.count() != 0:
+        if score_DB.won_count != 0:
+            # Suppressed this from the model...
+            score_DB.win_ratio = round((score_DB.won_count / score_DB.word_count) * 100)
+            win_hits = user_won_records.aggregate(Sum("hits"))["hits__sum"]
+            win_misses = user_won_records.aggregate(Sum("misses"))["misses__sum"]
             score_DB.win_efficiency = round((win_hits / (win_hits + win_misses)) * 100)
         else:
-            # If the user ain't won anything, he don't get anything. Right?
             score_DB.win_ratio = 0
             score_DB.win_efficiency = 0
 
@@ -274,6 +274,108 @@ def put_score(user):
     except Exception as error:
         print(f"ERROR: {error}")
         return False
+
+
+
+def home_scores(current_app_user):
+    score_pairs = {
+        "Expert": (501, 150000), 
+        "Addicted": (251, 500), 
+        "Dedicated": (51, 250), 
+        "Interested": (11, 51), 
+        "Sampler": (0, 10)
+    }
+    # Leaderboard data.
+    score_records = UserScoreCard.objects.all().order_by("-win_ratio", "-won_count", "-win_efficiency")
+    
+    # print(score_records[0].user.username)
+    qlist = list()
+    level_list = list()
+    inner_data = dict()
+    current_user_record = None
+    # current_user_data default, in case no one is logged in.
+    current_user_data = {
+        "level": None,
+        "place": 0,
+        "win_ratio": 0,
+        "win_eff": 0
+    }
+    """
+    Okay, what is this next bit doing?
+    First, a loop is being established that iterates through each level found in the
+    score_pairs keys.
+    A score_category is created for the level, which is nothing more than all the records
+    filtered by being between (inclusive) the values in the tuple for that level, taken from score records,
+    which is everything in the UserScoreCards model.
+    Immediately, before anymore iteration is done, it is determined if the current user is in that
+    score_category range (this is for the information box on the home.html page of the site).
+    Check if the user (logged in, of course) happens to be in that score category.
+    If so, user data is collected. Otherwise, default remains.
+    Then, the first three items of the queryset for each level are collected in a temporary dict
+    called qlist, which itself is made up of three other temporary dicts called inner_data.
+    If there are not three places for a particular level (that is, there may not be 3 elements in
+    the queryset for that level), the loop to create inner_data will insert blank data instead of 
+    producing an index error. 
+    Finally, all of this is collected in context dict, and shunted on to the home.html page.
+    It is quite a lot to put in the views.py file, so I will probably port this out to functions.py, 
+    and return the data as a tuple of dicts to only be unpacked (t)here.
+    """
+    # Only get the user record if someone is logged in.
+    if current_app_user.is_authenticated:
+        current_user_record = score_records.get(user = current_app_user)
+
+    for level in score_pairs.keys():
+        score_category = score_records.filter(won_count__gte = score_pairs[level][0], won_count__lte = score_pairs[level][1])
+        
+        # Only do this is someone is logged in, for obvious reasons!
+        if current_app_user.is_authenticated:
+            if current_user_record in score_category:
+                current_user_data["level"] = level
+                current_user_data["win_ratio"] = current_user_record.win_ratio
+                current_user_data["win_eff"] = current_user_record.win_efficiency
+                """
+                I have it on the word of some authorities in Django in posts on the SO and DJ  
+                that the following is the best way to find the "index" of a particular queryset.
+                Apparently, querysets are generator objects, and for some reason prefer to
+                be counted rather than being serched for by indexing. 
+                Weird, as you can also use slicing on them, which is a form of indexing.
+                Hope I clear THAT up soon. Confusing.
+                """
+                for i in range(len(score_category)):
+                    if current_user_record == score_category[i]:
+                        current_user_data["place"] = i + 1
+                        break
+        # print(current_user_data) # Anyway, it works...
+        for i in range(3):
+            try:
+                inner_data = {
+                    "player": f"{i + 1} - {score_category[i].user.username}",
+                    "won_count": f"{score_category[i].won_count}",
+                    "word_count": f"{score_category[i].word_count}",
+                    "win_ratio": f"{score_category[i].win_ratio}%",
+                    "win_eff": f"{score_category[i].win_efficiency}%"
+                }
+                
+            except IndexError:
+                inner_data = {
+                    "player": f"{i + 1} - ---",
+                    "won_count": "---",
+                    "word_count": "---",
+                    "win_ratio": "---",
+                    "win_eff": "---"
+                }
+            qlist.append(inner_data.copy())
+            
+        """
+        Seen this before. Do not append the list itself, but a shallow copy of it.
+        If the list itself is appended, then when cleared there will be an empty 
+        list in the new qlist object. Which is bad, incidentally.
+        """
+        level_list.append({level: qlist.copy()})
+        qlist.clear()
+        inner_data.clear()
+    
+    return (level_list, current_user_data)
 
 
 

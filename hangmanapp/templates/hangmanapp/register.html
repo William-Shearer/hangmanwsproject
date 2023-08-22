@@ -11,7 +11,7 @@
 
     <div id="formFrame" class="container-md d-flex justify-content-center p-2 my-1">
         <div class="row align-items-center">
-            <div class="col border border-primary rounded bg-light p-3">
+            <div class="col border border-primary rounded bg-light p-1 m-1">
                 
                 <form method="POST" action="{% url 'register' %}">
                     {% csrf_token %}
@@ -23,24 +23,26 @@
                     {% endif %}
                     <table>
                         <tr>
-                            <td>{{ form.username.label }}</td>
-                            <td>{{ form.username }}</td>
+                            <td style="padding-bottom: 5px;">{{ form.username.label }}</td>
+                            <td style="padding-bottom: 5px; min-width: 120px;">{{ form.username }}</td>
+                        </tr>
+                        <!--
+                        <tr>
+                            <td style="padding-bottom: 5px;">{{ form.first_name.label }}</td>
+                            <td style="padding-bottom: 5px; min-width: 120px;">{{ form.first_name }}</td>
                         </tr>
                         <tr>
-                            <td>{{ form.first_name.label }}</td>
-                            <td>{{ form.first_name }}</td>
+                            <td style="padding-bottom: 5px;">{{ form.last_name.label }}</td>
+                            <td style="padding-bottom: 5px; min-width: 120px;">{{ form.last_name }}</td>
+                        </tr>
+                        -->
+                        <tr>
+                            <td style="padding-bottom: 5px;">{{ form.email.label }}</td>
+                            <td style="padding-bottom: 5px; min-width: 120px;">{{ form.email }}</td>
                         </tr>
                         <tr>
-                            <td>{{ form.last_name.label }}</td>
-                            <td>{{ form.last_name }}</td>
-                        </tr>
-                        <tr>
-                            <td>{{ form.email.label }}</td>
-                            <td>{{ form.email }}</td>
-                        </tr>
-                        <tr>
-                            <td>{{ form.password.label }}</td>
-                            <td>{{ form.password }}</td>
+                            <td style="padding-bottom: 5px;">{{ form.password.label }}</td>
+                            <td style="padding-bottom: 5px; min-width: 120px;">{{ form.password }}</td>
                         </tr>
                         <tr>
                             <td>{{ form.confirmation.label }}</td>

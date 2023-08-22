@@ -1,6 +1,23 @@
+tr.scoreBoard:nth-child(even) {
+    background-color: #E6E6FA;
+}
+
+h1.homeHeading
+{
+    font-size: 2.5rem;
+}
+
+@media screen and (max-width: 1200px)
+{
+    h1.homeHeading
+    {
+        font-size: 2rem;
+    }
+}
+
 #frontFrame
 {
-    background-color: antiquewhite;
+    background-image: linear-gradient(to bottom right, #fad7a0 40%, antiquewhite 60%);
     border: 1px solid  #2e86c1;
     border-radius: 5px;
     padding: 0.5rem;
@@ -142,6 +159,8 @@ input.formBtn
     box-shadow: 2px 2px #aaa;
     color: black;
     min-width: 8rem;
+    margin-top: 3px;
+    margin-bottom: 3px;
 }
 
 input.formBtn:hover
@@ -155,3 +174,45 @@ input.formBtn:active
     color: white;
 }
 
+
+button.pageBtn
+{
+    display: flex;
+    color: black;
+    align-items: center;
+    justify-content: center;
+    background-color: #e0ffff;
+    border: #2e86c1;
+    border: 1px solid #6e3a88;
+    margin-left: 2px;
+    margin-right: 2px;
+    min-width: 100px;
+    font-size: 0.85rem;
+}
+
+@media screen and (max-width: 350px)
+{
+    button.pageBtn
+    {
+        min-width: 70px;
+        font-size: 0.65rem;
+    }
+}
+
+button.pageBtn:hover
+{
+    background-color: #c1fcfc;
+}
+
+button.pageBtn:active
+{
+    background-color: #84f7f7;
+    color: blue;
+}
+
+button.pageBtn:disabled
+{
+    background-color: #e0ffff;
+    opacity: 1;
+    color: black;
+}
