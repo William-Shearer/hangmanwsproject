@@ -33,7 +33,7 @@ This rendition of Hangman attempts to enrich the experience of the game by addin
   
 Why Hangman, particularly? And why do I consider this an appropriate submission for CS50W?  
   
-The inspiration to create a web based, competitive Hangman application was born from a previous and much smaller scale project that I created with the object of practicing and improving my general Python 3 programming. Said project can be viewed [here](https://github.com/William-Shearer/HangManWS). Creating an interactive game utilizing Django seemed a logical next step.  
+The inspiration to create a web based, competitive Hangman application was born from a previous and much smaller scale project that I created with the object of practicing and improving my general Python 3 programming. Said project can be viewed **[here](https://github.com/William-Shearer/HangManWS)**. Creating an interactive game utilizing Django seemed a logical next step.  
   
 I consider this a suitable submission for the final project, primarily, based on these terms of the project specifications, which state:  
   
@@ -78,10 +78,39 @@ All the pages have a navbar along the top that contains hyperlinks to the differ
   
 From the Home page, a logged in user may additionally view a modal window that explains the scoring system. The Home page contains an introduction / welcome text if logged out. If logged in, it displays summary of the players performance, a button to begin playing the game, and a hyperlink to the History page. Regardless of whether the user is logged in or not, a Leaderboard is visible. This leaderboard is divided into the five levels of attainment that the game employs, and displays the first three places of each level category. More information on scoring is included later in this text.  
   
-The Game page displays a visual representation of the gallows, a section that contains the buttons of the alphabet characters, and a section below that contains the required number of spaces (blanks represented as underlines) for the word to be guessed. The game implementation is very simple to understand; click on the desired letter and, if it is in the word, the corresponding blanks are filled. Once a letter has been clicked, the letter button will be disabled.  
+The Game page displays a visual representation of the gallows, a section that contains the buttons of the alphabet characters, and a section below that contains the required number of spaces (blanks represented as underlines) for the word to be guessed. The visual representation was implemented using HTML canvas, controlled via JavaScript. This is an area I have some limited previous experience with, and therefore did not go overboard with it. In any case, the rough and simple graphics are ideally suited to the game, as it is usually played on a piece of paper or a chalkboard, hand drawn. The game implementation is very simple to understand; click on the desired letter and, if it is in the word, the corresponding blanks are filled. Once a letter has been clicked, the applicable letter button will be disabled to avoid repeat, wasted guesses.  
   
 The player is not obliged to finish a word once they start. They may quit out at any time, and even log out. The next time they play, the game will resume at the point they left off. If the player wins (gets the word with a maximum of six missed letters), they will get a message presenting their word score. The word score is based on how many letters were asserted over the total number of letters tried. The word score is only applicable if the user wins the round. 
   
-The History page shows all the words the user has ever attempted, ordered from the most recent, descending. For this reason, the page is paginated, containing data for five words at a time. Detailed information of the player's performance in completing (or not) each word is displayed, which includes the the word score (if the player won) or how much of the word they completed (if they lost). Which letters were asserted and which were missed are also displayed, in the order they were played.
+All the JavaScript code that controls the game is located in the game.js file, in the static directory. It includes a couple of fetch asynchronous functions to trigger the back end functions to either provide or store game progress in the models.  
+    
+The History page shows all the words the user has ever attempted, ordered from the most recent, descending. For this reason, the page is paginated, containing data for five words at a time. Detailed information of the player's performance in completing (or not) each word is displayed, which includes the the word score (if the player won) or how much of the word they completed (if they lost). Which letters were asserted and which were missed are also displayed, in the order they were played.  
   
-One of my personal objectives for this project was to explore the usage of external websites, via API calls, to supply data to an application. I wanted to try this both from the back end and the front end, with Python and JavaScript, respectively. For this reason, I implemented a pane that contains a definition of the word. The definition is obtained by a JavaScript fetch call to **[Free Dictionary API](https://dictionaryapi.dev/)**. Apart from satisfying my curiosity about the programming subject, this feature also adds some educational value to the application.
+One of my personal objectives for this project was to explore the usage of external websites, via API calls, to supply data to an application. I wanted to try this both from the back end and the front end, with Python and JavaScript, respectively. For this reason, I implemented a pane that contains a definition of the word. The definition is obtained by a JavaScript fetch call to **[Free Dictionary API](https://dictionaryapi.dev/)**. Apart from satisfying my curiosity about the programming subject, this feature also adds some educational value to the application.  
+  
+The JavaScript code that controls the access to the third party site and processes the responses is located in the dictionary.js file, in the static directory.  
+  
+The Register, Login, and Change password pages can assumed to be fairly self explanatory and familiar enough to everyone to not warrant an expanded explanation. Suffice to say, they are there.  
+  
+### Back end  
+  
+Most of the time invested in this project was spent developing the back end with Python 3. As already mentioned, there was ample opportunity to explore gameplay control with the language. Python proved to be more than up to providing solutions to the problems, and certainly extended and reinforced my own understanding.  
+  
+Many of the functions required to enable the game play were large, and were moved to a separate functions.py file in the Django application directory structure. This avoided cluttering the views.py file and enhances code readability.  
+  
+The most important part of the back end, as far as the game is concerned, is the remote selection of words to present to the player. As with the History page on the front end, I wanted to explore the possibility of using a third party, free random word generation API. For this purpose, I used the **[random-word-api](https://random-word-api.vercel.app/)**. This entailed utilizing the Python [requests](https://pypi.org/project/requests/) module in the project. This API is the primary source for words to be used in the game.  
+  
+Consideration was also given to the fact that, using an external API to provide words, some inappropriate language might sneak in every so often. Therefore, a filter was implemented. Several text lists of words to be excluded can be found with a search, and I used one of these as a template in the filter.  
+  
+Following this, failure of the external API was also considered, and some error trapping was implemented for this event. In fact, two alternate methods for word selection were incorporated. The first uses a text file of over 1,000 words, bundled in with the back end and stored in the wordbank directory. It is accessed by the program after being loaded from this location. If this file is missing, or is damaged, a last, hard coded list of words is included in the functions.py file.  
+  
+## Conclusion  
+  
+There is little more to say regarding the application. The code itself is extensively commented, mostly for my own reference. However, it may prove of some value during the evaluation process.  
+  
+One additional point that I clarified during this project was Django's pagination functionality. Indeed, it was utilized in the last project, but understanding of it was superficial, at best. I delved deeper into its inner workings on this project, and am satisfied that my understanding of it is nearer to being complete than it was at the outset.  
+  
+Thank you for your kind attention.  
+  
+William Shearer, Quito, Ecuador, August 2023  
+  

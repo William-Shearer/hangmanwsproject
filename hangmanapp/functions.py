@@ -1,5 +1,5 @@
 # from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
+# from django.core.files.storage import default_storage
 # from django.core.exceptions import ObjectDoesNotExist
 from random import randint
 from django.db.models import Sum
