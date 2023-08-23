@@ -1,0 +1,81 @@
+{% extends "hangmanapp/layout.html" %}
+
+{% block title %}History{% endblock %}
+
+{% block head %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'hangmanapp/gamestyles.css' %}">
+    <script src="{% static 'hangmanapp/dictionary.js' %}"></script>
+{% endblock %}
+
+{% block body %}
+    <div class="container-md justify-content-center">
+        {% if historic_data %}            
+            {% for record in historic_data %}
+      
+                <div class="row m-1 border border-primary rounded justify-content-around" style="background-color: blanchedalmond;">
+                    <div class="col-12">
+                        <div name="recordFrame" class="row d-flex justify-content-around align-items-center">
+                            <div class="col-12">
+                                <h1 class="text-primary display-5 fw-bold ms-2">{{ record.word.capitalize }}</h1>
+                            </div>
+                            
+                            <div class="col-11 col-lg-4 border border-dark bg-light rounded m-2 px-2 py-3">
+                                <h5 style="color: blue;">Scoring:</h5>
+                                {% if record.won == True %}
+                                    You <b>completed</b> this word.<br>Your word score: <b>{{ record.win_score }}</b><br>
+                                {% else %}
+                                    You <b>failed</b> to complete this word. <br>How far you got: <strong>{{ record.p_word }}</strong><br>
+                                {% endif %}
+                                You got <strong>{{ record.hit_num }}</strong> letters (
+                                    {% for c in record.win_chars %}
+                                        {{ c }} 
+                                    {% empty %}
+                                        -
+                                    {% endfor %}
+                                ).<br>
+                                You missed <strong>{{ record.miss_num }}</strong> letters (
+                                    {% for c in record.miss_chars %}
+                                        {{ c }}
+                                    {% empty %}
+                                        -
+                                    {% endfor %}
+                                ).
+                            </div>
+                            
+                            <div name="definitionFrame" class="col-11 col-lg-7 border border-dark bg-light rounded m-2 p-2">
+                                <h5 style="color: blue;">Definitions:</h5>
+                                <textarea class="defTextArea" style="width: 100%; resize: none;" rows="4" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            {% endfor %}
+        {% else %}
+            <h1>You have not played.</h1>
+        {% endif %}
+        <hr>
+        <div class="d-flex justify-content-center p-1">
+            {% if page_data %}
+                {% if page_data.has_previous %}
+                    <a style="text-decoration: none;" href="?page={{ page_data.previous_page_number }}"><button type="button" class="pageBtn btn btn-sm"><img src="{% static 'hangmanapp/caret-left-fill.svg' %}" alt="O">Previous</button></a>
+                {% else %}
+                    <button type="button" class="pageBtn btn btn-sm"><img src="{% static 'hangmanapp/caret-left.svg' %}" alt="O">Previous</button>
+                {% endif %}
+
+                <button type="button" class="pageBtn btn btn-sm" disabled>Page {{ page_data.current_page_number }}</button>
+
+                {% if page_data.has_next %}
+                    <a style="text-decoration: none;" href="?page={{ page_data.next_page_number }}"><button type="button" class="pageBtn btn btn-sm">Next<img src="{% static 'hangmanapp/caret-right-fill.svg' %}" alt="O"></button></a>
+                {% else %}
+                    <button type="button" class="pageBtn btn btn-sm">Next<img src="{% static 'hangmanapp/caret-right.svg' %}" alt="O"></button>
+                {% endif %}
+            {% endif %}
+        </div>
+        <hr>
+
+    </div>
+
+    
+{% endblock %}

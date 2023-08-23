@@ -10,7 +10,7 @@
 {% block body %}
 <div id="formFrame" class="container-md d-flex justify-content-center p-2 my-1">
     <div class="row align-items-center">
-        <div class="col border border-primary rounded bg-light p-3">
+        <div class="col border border-primary rounded bg-light p-1 m-1">
             
             <form method="POST" action="{% url 'login' %}">
                 {% csrf_token %}
@@ -22,8 +22,8 @@
                 {% endif %}
                 <table>
                     <tr>
-                        <td>{{ form.username.label_tag }}</td>
-                        <td>{{ form.username }}</td>
+                        <td style="padding-bottom: 5px;">{{ form.username.label_tag }}</td>
+                        <td style="padding-bottom: 5px;">{{ form.username }}</td>
                     </tr>
                     <tr>
                         <td>{{ form.password.label_tag }}</td>

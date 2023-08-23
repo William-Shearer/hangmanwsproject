@@ -1,0 +1,43 @@
+{% extends "hangmanapp/layout.html" %}
+
+{% block title %}Change Pwd{% endblock %}
+
+{% block head %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'hangmanapp/gamestyles.css' %}">
+{% endblock %}
+
+{% block body %}
+    <div id="formFrame" class="container-md d-flex justify-content-center p-2 my-1">
+        <div class="row align-items-center">
+            <div class="col border border-primary rounded bg-light p-1 m-1">
+                
+                <form method="POST" action="{% url 'changepwd' %}">
+                    {% csrf_token %}
+                    <h3 class="text-primary">Change Password</h3>
+                    <hr>
+                    {% if message %}
+                        <h5 class="text-danger fw-bold">{{ message }}</h5>
+                        <hr>
+                    {% endif %}
+                    <table>
+                        <tr>
+                            <td style="padding-bottom: 5px;">{{ form.password.label_tag }}</td>
+                            <td style="padding-bottom: 5px;">{{ form.password }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ form.repeat.label_tag }}</td>
+                            <td>{{ form.repeat }}</td>
+                        </tr>
+                    </table>
+                    <hr>
+                    <div class="text-center pt-2">
+                        <input class="formBtn mx-1" type="submit" value="Change">
+                        <a href="{% url 'home' %}"><input class="formBtn mx-1" type="button" value="Back"></a>
+                        
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

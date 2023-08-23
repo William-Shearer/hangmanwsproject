@@ -275,7 +275,11 @@ async function fPutWordHistory(wObj, putUrl)
     const controller = new AbortController();
     // const url = "puthistory"; // Superseded.
     const url = putUrl;
+<<<<<<< HEAD
     // console.log(url);
+=======
+    console.log(url);
+>>>>>>> Score-card-mod
     const timeOut = setTimeout(
         function ()
         {

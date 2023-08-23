@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from datetime import date
 
 class User(AbstractUser):
     pass
@@ -29,6 +30,22 @@ class UserWordHistory(models.Model):
     def __str__(self):
         return f"The word \"{self.word.upper()}\" for user {self.user.username}, completed {self.complete}"
     
-    
 
- 
+class UserScoreCard(models.Model):
+    """
+    There are one of these ScoreCards for each user.
+    How the scoring system works.
+    Primarily, the ratio of the words won to total words, per user, is used.
+    won_words / total_words gives the percentage score of this ratio.
+    A secondary score is figured as an efficiency rating of won words.
+    win_efficiency = total_hits_in_won_words / (total_hits_in_won_words + total_misses_in_won_words)
+    """
+    user = models.OneToOneField(User, on_delete = models.CASCADE, related_name = "user_by_score")
+    win_ratio = models.PositiveSmallIntegerField(default = 0)
+    win_efficiency = models.PositiveSmallIntegerField(default = 0)
+    won_count = models.PositiveIntegerField(default = 0)
+    word_count = models.PositiveIntegerField(default = 0)
+
+    def __str__(self):
+        return f"ScoreCard for {self.user.username} with {self.word_count} words"
+    

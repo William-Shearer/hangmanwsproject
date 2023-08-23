@@ -10,37 +10,95 @@
 {% block body %}
     
     <div id="frontFrame" class="container-md justify-content-center">
-        <div class="row justify-content-center align-items-center m-1 py-3">
-            <div class="col-12 col-lg-6 p-1">
-                <div class="bg-light p-2 rounded border border-dark"> 
-                    <h1 class="fw-bold text-primary">Hangman Challenge</h1>
-                    {% if request.user.is_authenticated %}
-                        <p class="lead" style="text-align: justify;"><span class="fw-bold display-6">H</span>ello, <b>{{ request.user.username }}</b>!</p>
-                    {% else %}
-                        
-                        <p class="lead" style="text-align: justify;"><span class="fw-bold display-6">W</span>elcome to the Hangman Challenge</p>
-                        <p style="text-align: justify;">Improve your vocabulary and compete against other spelling gurus for the first place in <b>Expert Level</b>.</p>
-                        <p style="text-align: justify;">The rules are simple. Just play <b>Hangman</b>! Figure out each word with as few incorrect guesses as possible. You may miss up to six letters before losing the round, but the less you miss, the better your score will be.</p> 
-                        <p style="text-align: justify;"><a href="{% url 'login' %}">Log in</a> or <a href="{% url 'register' %}">register</a> for an account, so that your scores may be preserved, and play away!</p>
-                    {% endif %}
-                    <h6 class="fw-bolder text-decoration-underline">Levels</h6>
-                    <ul>
-                        <li><i><b>Sampler:</b></i> 1 to 10 words</li>
-                        <li><i><b>Interested:</b></i> 11 to 50 words</li>
-                        <li><i><b>Dedicated:</b></i> 51 to 250 words</li>
-                        <li><i><b>Addicted:</b></i> 251 to 500 words</li>
-                        <li><i><b>Expert:</b></i> +501 words</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-12 col-lg-6 p-1">
-                <div class="bg-light p-2 rounded border border-dark">
-                    <h1 class="fw-bold text-primary">Hangman Leaderboard</h1>
+        <div class="row justify-content-around align-items-center m-1 p-0 p-md-1">
+            <div class="col-12 col-lg-6 p-2 m-1 bg-light rounded border border-dark">
+                
+                <h1 class="fw-bold text-primary homeHeading">Hangman Challenge</h1>
+                {% if request.user.is_authenticated %}
+                    <p class="lead" style="text-align: justify;"><span class="fw-bold display-6">H</span>ello, <b>{{ request.user.username }}</b>!</p>
+                    <p style="text-align: justify;">You are currently at Level <strong>{{ current_user.level }}</strong>, holding place number <strong>{{ current_user.place }}</strong>. Your win ratio is <strong>{{ current_user.win_ratio }}%</strong>. Your word score is <strong>{{ current_user.win_eff }}%</strong>. Check out the <a href="#" value="Scoring" data-bs-toggle="modal" data-bs-target="#scoreInstruction"> scoring system</a> for more information on what this means.</p>
+                    <p style="text-align: justify;">For more information regarding your performance and previous words you have played, please check your personal <a href="{% url 'history' %}">History</a> page.</p>
+                    <div class="row">
+                        <div class="col d-flex justify-content-center">
+                            <a href="{% url 'game' %}"><input class="formBtn mx-1" type="button" value="Play game!"></a>
+                        </div>
+                    </div>
+                {% else %}
                     
+                    <p class="lead" style="text-align: justify;"><span class="fw-bold display-6">W</span>elcome to the Hangman Challenge</p>
+                    <p style="text-align: justify;">Improve your vocabulary and compete against other spelling gurus for the first place in <b>Expert Level</b>.</p>
+                    <p style="text-align: justify;">The rules are simple. Just play <b>Hangman</b>! Figure out each word with as few incorrect guesses as possible. You may miss up to six letters before losing the round, but the less you miss, the better your letter skill score will be.</p> 
+                    <p style="text-align: justify;"><a href="{% url 'login' %}">Log in</a> or <a href="{% url 'register' %}">register</a> for an account, so that your scores may be preserved, and play away!</p>
+                {% endif %}
+                <h6 class="fw-bolder text-decoration-underline">Levels</h6>
+                <ul>
+                    <li><i><b>Expert:</b></i> +501 words correct</li>
+                    <li><i><b>Addicted:</b></i> 251 to 500 words correct</li>
+                    <li><i><b>Dedicated:</b></i> 51 to 250 words correct</li>
+                    <li><i><b>Interested:</b></i> 11 to 50 words correct</li>
+                    <li><i><b>Sampler:</b></i> 1 to 10 words correct</li>
+                </ul>
+                
+            </div>
+            <div class="col-12 col-lg-5 p-2 m-1 bg-light rounded border border-dark">
+                
+                <h1 class="fw-bold text-primary homeHeading">Hangman Leaderboard</h1>
+                    <!--
+                    <dl>
+                        {% for item in data %}
+                            {% for key, qset in item.items %}
+                                <dt>{{ key }}</dt>
+                                {% for user in qset %}
+                                    <dd>{{ user }}</dd>
+                                {% endfor %}
+                            {% endfor %}
+                        {% endfor %}
+                    </dl>
+                    -->
+                    <table style="width:100%;">
+                        <tr class="scoreBoard">
+                            <th style="font-size: 0.75em; width: 20%">User Name</th>
+                            <th style="font-size: 0.75em; width: 20%">Win ratio</th>
+                            <th style="font-size: 0.75em; width: 20%">Words won</th>
+                            <th style="font-size: 0.75em; width: 20%">Total words</th>
+                            <th style="font-size: 0.75em; width: 20%">Word score</th>
+                        </tr>
+                    </table>
+                    {% for item in data %}
+                        <table style="width:100%;">
+                            {% for key, qset in item.items %}
+                                <tr class="scoreBoard"><th style="color: #4499fe">{{ key }}</th></tr>
+                                {% for inner_data in qset %}
+                                    <tr class="scoreBoard">
+                                        <td style="font-size: 0.75rem; width: 20%"><strong>{{ inner_data.player }}</strong></td>
+                                        <td style="font-size: 0.75rem; width: 20%">{{ inner_data.win_ratio }}</td>
+                                        <td style="font-size: 0.75rem; width: 20%">{{ inner_data.won_count }}</td>
+                                        <td style="font-size: 0.75rem; width: 20%">{{ inner_data.word_count }}</td>
+                                        <td style="font-size: 0.75rem; width: 20%">{{ inner_data.win_eff }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </table>
+                    {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Scoring instructions modal -->
+    <div id="scoreInstruction" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background-color: antiquewhite;">
+                <div class="modal-header">
+                    <h4 class="modal-title text-primary fw-bold">Scoring</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <textarea style="width: 100%; resize: none;" rows="7">{{ text_text }}</textarea>
                 </div>
             </div>
         </div>
     </div>
+      
 
     
 
