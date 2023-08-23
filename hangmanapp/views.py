@@ -139,8 +139,9 @@ def home_page(request):
     What needs to be returned from the function: level_list and current_user_data.
     """
     if request.method == "GET":
+        text_area = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged."
         level_list, current_user_data = home_scores(request.user)
-        context = {"data": level_list, "current_user": current_user_data}
+        context = {"data": level_list, "current_user": current_user_data, "text_text": text_area}
         # print(context)
         return render(request, "hangmanapp/home.html", context = context)
         

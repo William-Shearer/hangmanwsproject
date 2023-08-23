@@ -23,7 +23,7 @@
                             <div class="col-11 col-lg-4 border border-dark bg-light rounded m-2 px-2 py-3">
                                 <h5 style="color: blue;">Scoring:</h5>
                                 {% if record.won == True %}
-                                    You <b>completed</b> this word.<br>Your win efficiency score: <b>{{ record.win_score }}</b><br>
+                                    You <b>completed</b> this word.<br>Your word score: <b>{{ record.win_score }}</b><br>
                                 {% else %}
                                     You <b>failed</b> to complete this word. <br>How far you got: <strong>{{ record.p_word }}</strong><br>
                                 {% endif %}
