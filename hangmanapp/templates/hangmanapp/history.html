@@ -10,7 +10,12 @@
 
 {% block body %}
     <div class="container-md justify-content-center">
-        {% if historic_data %}            
+        {% if historic_data %}
+            <div class="row m-1 border border-primary rounded justify-content-around" style="background-color: burlywood;">
+                <div class="col text-center px-3 pb-1 m-1">
+                    <h3 class="text-dark display-6 fw-bold">Word History</h3>
+                </div>
+            </div>            
             {% for record in historic_data %}
       
                 <div class="row m-1 border border-primary rounded justify-content-around" style="background-color: blanchedalmond;">
@@ -50,12 +55,26 @@
                         </div>
                     </div>
                 </div>
-                
+                <div class="row m-1 border border-primary rounded justify-content-around" style="background-color: MistyRose;">
+                    <div class="col text-center px-3 pb-1 m-1">
+                        <a href="{% url 'home' %}"><input class="formBtn mx-1" type="button" value="Back"></a>
+                    </div>
+                </div>
             {% endfor %}
         {% else %}
-            <h1>You have not played.</h1>
+            <div id="formFrame" class="container-md d-flex justify-content-center p-2 my-1">
+                <div class="row align-items-center">
+                    <div class="col border border-primary rounded bg-light text-center p-3 m-1">
+                        <h3>No History</h3>
+                        <h5>You have not played the game</h5>
+                        <a href="{% url 'home' %}"><input class="formBtn mx-1" type="button" value="Back"></a>
+                    </div>
+                </div>
+            </div>
         {% endif %}
         <hr>
+
+        <!-- PAGINATION -->
         <div class="d-flex justify-content-center p-1">
             {% if page_data %}
                 {% if page_data.has_previous %}

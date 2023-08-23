@@ -3,6 +3,14 @@ const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
 const congratulations = ["Well done!", "Awesome!", "Good job!", "Excellent!", "Great work!", "Fantastic!", "You got it!", "Cool!"];
 const conmiserations = ["Too bad.", "Bad luck.", "So sorry.", "Awww!", "Next time.", "Keep trying.", "Tough!", "Nice try!"]
 
+/*
+Take note: The application must be protected against the user reloading the browser.
+That means up in the DOMContentLoaded, the word should be fetched from the Django model,
+if it is incomplete. Else, a new word should be generated. This will have the effect
+of saving a session, too. If the player leaves the game before finishing a word, when
+they come back the same word will be presented for them to resume and complete.
+*/
+
 document.addEventListener("DOMContentLoaded",
     async function()
     {

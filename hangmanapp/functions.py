@@ -14,6 +14,14 @@ fail_safe = [
     "debacle", "tragic", "tragedy", "fiasco", "shambles" 
 ]
 
+"""
+The scoring explanation string
+"""
+scroing_string = """
+The first scoring parameter is the LEVEL you are in. It is based on a range of words that you have played and completed successfuly. The ranges for the levels are already described on the home page, from SAMPLER (lowest) to EXPERT (highest).\r\n
+The next score is your WORD RATIO, which is the result of the words correct over the total words attempted. This is the primary specification that determines if you are at the top of your level. Essentially, if you have attempted 10 words, and succeeded in guessing 5, your win ratio will be 50%.\r\n
+The WORD SCORE is the final parameter and serves as a tie breaker against other players. Only if you successfully complete a word, the number of correct letter guesses over the total number of letter guesses is calculated. It is a measure of how efficient you are in guessing a word correctly, with as few blank guesses as possible.
+"""
 
 def get_word(user):
     """
@@ -401,4 +409,26 @@ def clean_censor():
         for word in new_list:
             file.write(word + " ")
 
-          
+
+# OLD REFERENCE COMMENTS AND CODE. DEFUNCT.
+       
+"""
+Right here. It is IMPORTANT to remember that the function get_word(), seen below, 
+in functions.py returns the word broken up into a list of characters. Here, the same thing
+MUST be done. The word, however, is stored in the model as a string. There is another
+very simple function in functions.py to convert an existing word in the DB into such a list
+before it is passed to the JavaScript module. Here it is in use.
+"""
+# Redundant now, but good enough stuff to keep as reference for my notes.
+# word = convert_to_list(word_select.word)
+# pWord = convert_to_list(word_select.player_word)
+# print(len(word))
+
+"""
+Change of plan. I will have JavaScript doing the conversion to and from array.
+Here, I will send the whole darn object to JavaScript and do everything up there.
+This needs to happen on two conditions.
+1. The word structure is already in the DB.
+2. The word needs creating.
+"""
+

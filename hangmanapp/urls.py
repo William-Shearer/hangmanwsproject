@@ -11,8 +11,9 @@ urlpatterns = [
     path("history", views.history_view, name = "history"),
     # API
     path("fetchword", views.fetch_word, name = "fetchword"),
-    path("puthistory", views.put_history, name = "puthistory"),
+    path("puthistory", views.put_history, name = "puthistory")
     # path("putuserscore", views.put_score, name = "putuserscore"), # suppressed.
     # ERRORS
-    path("error", views.general_error, name = "error")
+    # path("error", views.general_error, name = "error")
 ]
+

@@ -1,4 +1,6 @@
 from pathlib import Path
+# import os
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -6,7 +8,7 @@ SECRET_KEY = 'django-insecure-55fmj_n$6d_5woi5#3=%^eucasat6ju)x!n=tl5+z-(2le&(l@
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1"]
 
 INSTALLED_APPS = [
     "hangmanapp.apps.HangmanappConfig",
@@ -48,6 +50,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'hangmanwsproject.wsgi.application'
+
 
 DATABASES = {
     'default': {
