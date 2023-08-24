@@ -24,12 +24,11 @@
                         </div>
                     </div>
                 {% else %}
-                    
-                    <p class="lead" style="text-align: justify;"><span class="fw-bold display-6">W</span>elcome to the Hangman Challenge</p>
-                    <p style="text-align: justify;">Improve your vocabulary and compete against other spelling gurus for the first place in <b>Expert Level</b>.</p>
-                    <p style="text-align: justify;">The rules are simple. Just play <b>Hangman</b>! Figure out each word with as few incorrect guesses as possible. You may miss up to six letters before losing the round, but the less you miss, the better your letter skill score will be.</p> 
-                    <p style="text-align: justify;"><a href="{% url 'login' %}">Log in</a> or <a href="{% url 'register' %}">register</a> for an account, so that your scores may be preserved, and play away!</p>
-                {% endif %}
+                <p class="lead" style="text-align: justify;"><span class="fw-bold display-6">W</span>elcome to the Hangman Challenge</p>
+                <p style="text-align: justify;">Improve your vocabulary and compete against other spelling gurus for the first place in <b>Expert Level</b>.</p>
+                <p style="text-align: justify;">The rules are simple. Just play <b>Hangman</b>! Guess as many words correctly as you can to obtain a high <b>Win Ratio</b>, and figure out each word with as few incorrect guesses as possible. You may miss up to six letters before losing the round. The less you miss, the better your <b>Word Score</b>.</p>
+                <p style="text-align: justify;"><a href="{% url 'login' %}">Log in</a> or <a href="{% url 'register' %}">register</a> for an account, so that your scores may be preserved, and play away!</p>
+            {% endif %}
                 <h6 class="fw-bolder text-decoration-underline">Levels</h6>
                 <ul>
                     <li><i><b>Expert:</b></i> +501 words correct</li>

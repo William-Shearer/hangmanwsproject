@@ -6,11 +6,21 @@ This effectively complies with one of the project requirements, as stated in the
   
 - Your web application must utilize Django (including at least one model) on the back-end and JavaScript on the front-end.  
   
+### Video link  
+  
+The presentation video for the project can be viewed at this link: [Presentation Video](https://youtu.be/wNMjHQgKS6o)  
+  
+### Live demo
+  
+The demonstration of the application itself can be played here: [Deployed application](https://cygonparrot.pythonanywhere.com)
+  
 ## The ethical question  
   
-I want to get this out of the way as soon as possible. Granted, I have seen some online comments and articles that attempt to target Hangman as an inappropriate game. It is, after all, a simulation of an execution. However, I must clarify that I do not consider Hangman, in any way, inappropriate. There are currently more than enough (none the less enjoyable and entertaining, I add) video games in existence of which the objective is mindless destruction and massive subtraction of digitally represented life to justify the continued existence of this educational classic. Furthermore, the objective of Hangman is to save the condemned victim's life by getting the word right, not to deliberately get the word wrong so that the, let us assume, unfairly sentenced "man" is, indeed, hanged. I think I have made my point.  
+I want to get this point out of the way as soon as possible. Granted, I have seen some online comments and articles that attempt to target Hangman as an inappropriate game. It is, after all, a simulation of an execution. However, I must clarify that I do not consider Hangman, in any way, inappropriate. There are currently more than enough (none the less enjoyable and entertaining, I add) video games in existence of which the objective is mindless destruction and massive subtraction of digitally represented life to justify the continued existence of this educational classic. Furthermore, the objective of Hangman is to save the condemned victim's life by getting the word right, not to deliberately get the word wrong so that the, let us assume, unfairly sentenced "man" is, indeed, hanged. I think I have made my point.  
   
-## Overview  
+## Distinctiveness and Complexity  
+  
+### Overview  
   
 Hangman is an ubiquitous game often played by youngsters and adults alike because it adds some entertainment value to the exercise of expanding vocabulary. It is frequently played with a dictionary on hand, both so that challengers can find unusual words to test the players, and also to check the existence, or validity, of words.  
   
@@ -29,7 +39,7 @@ This rendition of Hangman attempts to enrich the experience of the game by addin
 - The historic data for each player can be viewed.
 - To add some educational value, the history view adds a definition for the word from another third party API.
   
-## Motivation  
+### Motivation  
   
 Why Hangman, particularly? And why do I consider this an appropriate submission for CS50W?  
   
@@ -103,6 +113,54 @@ The most important part of the back end, as far as the game is concerned, is the
 Consideration was also given to the fact that, using an external API to provide words, some inappropriate language might sneak in every so often. Therefore, a filter was implemented. Several text lists of words to be excluded can be found with a search, and I used one of these as a template in the filter.  
   
 Following this, failure of the external API was also considered, and some error trapping was implemented for this event. In fact, two alternate methods for word selection were incorporated. The first uses a text file of over 1,000 words, bundled in with the back end and stored in the wordbank directory. It is accessed by the program after being loaded from this location. If this file is missing, or is damaged, a last, hard coded list of words is included in the functions.py file.  
+  
+## File summary  
+  
+The following files have been created and/or modified to enable the functionailty of this application:
+  
+### Project level:
+  
+- settings.py: Various configurations for included supporting apps, directories, and deployment options.
+- urls.py: Preliminary configuration of routes for admin and application.
+- requirements.txt: Python pacjages used during the development of the application.
+- LICENSE: MIT license standard from GitHub.
+- README.md: This file.
+  
+### Application level:
+  
+At the application level, 
+  
+- admin.py: Registration of models to be accessible on the Django Admin page.
+- forms.py: Created file, includes the forms for log in, registration and change password.
+- functions.py: An important file created for the application. Contains all the external API and local word search, selection, and filtering functions used by the application, as well as the score formatting for the leaderboard and word saving/sorting routines.
+- models: Contains the three models utilized by the application to save users, maintain user word histories, and store player's scores persistently.
+- urls.py: Contains all the routes needed to allow the application to function.
+- views.py: Contains all the views needed by the application to enable functionality on server. A limited amount of calculations are performed in some of the functions, but most important functions are imported from functions.py.
+  
+Additionally, three directories were created at application level:
+  
+- static: The static directory contains a sub directory for the application (according to Django best practices), which in turn contains the following files:
+  
+    - Four SVG graphics of arrows, downloaded from Bootstrap, used to enhance the appearance of the pagination buttons on the History page of the application.
+    - One favicon.png, created with paint.net.
+    - game.js: The main JavaScript file of the application. The code that runs the hangman game is in this file, and performs word formatting, canvas drawing routines, letter button enabling and disabling, and fetch operations that save and update the data base during gameplay.
+    - dictionary.js: This JavaScript file is associated with the History page of the application and performs the calls to the external API with fetch, and formats the results for display on screen.
+    - gamestyles.css: Additional CSS style definitions and customizations that could not be handled by Bootstrap are included in this file.
+
+- templates: The directory that contains the sub directory for the application, which in turn contains the HTML templates:
+  
+    - changepwd.html: The Change Password page. Displays the Change Password Form.
+    - game.html: The application Game page. Specifically, imports game.js for functionality of the game.
+    - history.html: The player word History page. Imports dictionary.js for functionality of the word definitions.
+    - home.html: The opening page of the application, where the leaderboard is displayed.
+    - layout.html: The basic starting point format for all the pages. Includes the navbar.
+    - login.html: The log in page for the application. Displays the Log In Form.
+    - register.html: The new user registration page. Displays the Register Form.
+  
+  - wordbank: The directory contains text files that are loaded by the Python back end.
+  
+    - censor.txt: Used by one of the word filtering functions in functions.py. It contains a list of inappropriate language that the program matches to words obtained from the external API, and filters the words out if they coincide. WARNING: This file contains a list of VERY offensive words. Do not open and read it if you are a sensitive and easily perturbed individual.
+    - nouns_en.txt: A list of over 1,000 words in English that serve as a backup to provide game words in the event of a failure of the external random word generator API. 
   
 ## Conclusion  
   
