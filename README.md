@@ -157,7 +157,7 @@ Additionally, three directories were created at application level:
     - login.html: The log in page for the application. Displays the Log In Form.
     - register.html: The new user registration page. Displays the Register Form.
   
-  - wordbank: The directory contains text files that are loaded by the Python back end.
+- wordbank: The directory contains text files that are loaded by the Python back end.
   
     - censor.txt: Used by one of the word filtering functions in functions.py. It contains a list of inappropriate language that the program matches to words obtained from the external API, and filters the words out if they coincide. WARNING: This file contains a list of VERY offensive words. Do not open and read it if you are a sensitive and easily perturbed individual.
     - nouns_en.txt: A list of over 1,000 words in English that serve as a backup to provide game words in the event of a failure of the external random word generator API. 
